@@ -45,7 +45,7 @@ java {
 }
 
 application {
-    getMainClass().set('code.App')
+    getMainClass().set('trace-alignment.App')
 }
 
 dependencies {

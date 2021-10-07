@@ -16,6 +16,6 @@
  *
  */
 
-rootProject.name = 'code'
+rootProject.name = 'trace-alignment'
 include 'lib'
 include 'app'
