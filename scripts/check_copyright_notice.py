@@ -75,10 +75,10 @@ GRADLE_HEADER_REGEX = re.compile(r"^{}".format(STAR_COPYRIGHT_NOTICE), re.MULTIL
 
 ROOT = Path(os.path.dirname(inspect.getfile(inspect.currentframe())), "..").absolute()
 INCLUDE = {
-    *filter(methodcaller("is_file"), Path("code", "src").glob("**/*")),
-    *filter(methodcaller("is_file"), Path("code", "test").glob("**/*")),
-    *filter(methodcaller("is_file"), Path("code", "scripts").glob("**/*")),
-    Path("code", "settings.gradle"),
+    *filter(methodcaller("is_file"), Path("src").glob("**/*")),
+    *filter(methodcaller("is_file"), Path("test").glob("**/*")),
+    *filter(methodcaller("is_file"), Path("scripts").glob("**/*")),
+    Path("settings.gradle"),
 }
 IGNORE = { }
 
