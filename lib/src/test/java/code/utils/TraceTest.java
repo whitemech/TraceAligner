@@ -70,7 +70,8 @@ public class TraceTest {
 
     @Test
     public void testTraceAutomatonConstruction() throws Exception {
-        XLog log = ParseLog.openLog("../datasets/logs/real-life-logs/financial_log.xes");
+        String LOG_PATH = getClass().getClassLoader().getResource("financial_log_for_experiments.xes").getPath();
+        XLog log = ParseLog.openLog(LOG_PATH);
         for (XTrace trace : log) {
             Trace t = new Trace(XConceptExtension.instance().extractName(trace));
             List<String> al = new ArrayList<>();

@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class GeneralEncodingTest {
     private HashMap<Trace, Set<Automaton<String>>> constraints;
     private List<Trace> traces;
-    private final String LOG_PATH = getClass().getClassLoader().getResource("financial_log.xes").getPath();
+    private final String LOG_PATH = getClass().getClassLoader().getResource("financial_log_for_experiments.xes").getPath();
     private final String AUT_PATH = getClass().getClassLoader().getResource("1.ltlf").getPath();
     private final int LIMIT = 10000;
 
