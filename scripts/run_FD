@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+#  This file is part of Planning-Trace-Alignment.
+#
+#  Planning-Trace-Alignment is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU Lesser General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  Planning-Trace-Alignment is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public License
+#  along with Planning-Trace-Alignment.  If not, see <https://www.gnu.org/licenses/>.
+#
+#
+
+cd fast-downward/src/
+date1=$(date +%s%N | cut -b1-13)
+searchtime=0
+trace="$1"
+domain="Conformance_Checking/domain$trace.pddl"
+problem="Conformance_Checking/problem$trace.pddl"
+translate/translate.py $domain $problem < output.sas
+preprocess/preprocess < output.sas
+prima=$(date +%s%N | cut -b1-13)
+./search/downward --heuristic "hff=ff()"  --heuristic "hcea=cea()" --search "astar(blind())" < output
+dopo=$(date +%s%N | cut -b1-13)
+searchtime=$(($searchtime+$dopo-$prima))
+date2=$(date +%s%N | cut -b1-13)
+diff=$(($date2-$date1))
+transtime=$(($diff-$searchtime))
+#echo $date1
+#echo $date2
+echo "the duration for trace #$trace is: $diff ms."
+echo "the search time is: $searchtime ms."
+echo "the translation time is: $transtime ms."

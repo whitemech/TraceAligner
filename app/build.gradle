@@ -1,0 +1,97 @@
+/*
+ *  This file is part of Planning-Trace-Alignment.
+ *
+ *  Planning-Trace-Alignment is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Planning-Trace-Alignment is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with Planning-Trace-Alignment.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
+plugins {
+    id 'application'
+
+    // Static Analysis
+    // id 'checkstyle'
+    // id 'pmd'
+}
+
+apply plugin: 'idea'
+
+group 'org.diag.uniroma1'
+version '0.0.1'
+
+repositories {
+    mavenCentral()
+        maven {
+        url "https://jitpack.io"
+    }
+    flatDir {
+        dirs '../third_party'
+    }
+}
+
+java {
+    sourceCompatibility(JavaVersion.VERSION_1_8)
+    targetCompatibility(JavaVersion.VERSION_1_8)
+}
+
+application {
+    getMainClass().set('code.App')
+}
+
+dependencies {
+    implementation project(':lib')
+
+    // CLI
+    implementation 'info.picocli:picocli:4.6.1'
+    implementation 'commons-io:commons-io:2.8.0'
+
+    // Logging
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
+
+    // Testing
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events 'PASSED', 'FAILED', 'SKIPPED'
+    }
+    afterSuite { desc, result ->
+        if (!desc.parent) {
+            println "\nTest result: ${result.resultType}"
+            println "Test summary: ${result.testCount} tests, " +
+                    "${result.successfulTestCount} succeeded, " +
+                    "${result.failedTestCount} failed, " +
+                    "${result.skippedTestCount} skipped"
+        }
+    }
+}
+
+jar {
+    doFirst {
+        manifest {
+            if (!configurations.runtimeClasspath.isEmpty()) {
+                attributes(
+                        'Class-Path': configurations.runtimeClasspath.collect{it.toURI().toString()}.join(' '),
+                        'Main-Class': 'code.App')
+            }
+        }
+    }
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.findAll {it.isDirectory() ? it : zipTree(it) }
+    }
+}
