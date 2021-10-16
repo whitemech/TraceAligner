@@ -16,6 +16,8 @@
  *
  */
 
-rootProject.name = 'trace_alignment'
-include 'lib'
-include 'app'
+package trace_alignment.automaton;
+
+public interface AutomatonComponents {
+    String getAutomatonId();
+}

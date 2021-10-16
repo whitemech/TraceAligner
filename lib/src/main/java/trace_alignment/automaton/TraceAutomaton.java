@@ -16,6 +16,13 @@
  *
  */
 
-rootProject.name = 'trace_alignment'
-include 'lib'
-include 'app'
+package trace_alignment.automaton;
+
+import java.util.Set;
+
+public class TraceAutomaton<T> extends Automaton<T> {
+
+    public TraceAutomaton(Set<T> alphabet, Set<State> states, Set<Transition<T>> transitionFunction, Set<Transition<T>> no_dead_ends) {
+        super(alphabet, states, transitionFunction, no_dead_ends);
+    }
+}

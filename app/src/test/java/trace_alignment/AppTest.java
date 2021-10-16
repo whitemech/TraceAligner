@@ -16,6 +16,20 @@
  *
  */
 
-rootProject.name = 'trace_alignment'
-include 'lib'
-include 'app'
+package trace_alignment;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+class AppTest {
+
+    //    @Test
+    public void test01() {
+//        Reservation eecs2030 = new Reservation("Software Design", 2000.0);
+//        Reservation eecs2001 = new Reservation("Theory of Computation", 2500.0);
+//
+//        assertEquals(2000.0, eecs2030.getFee(), 0.01);
+//        assertEquals(2500.0, eecs2001.getFee(), 0.01);
+    }//
+
+}
