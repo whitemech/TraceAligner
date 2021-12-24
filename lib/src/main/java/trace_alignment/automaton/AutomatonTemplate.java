@@ -116,7 +116,7 @@ public class AutomatonTemplate {
         new_alphabet.addAll(traceAlphabet);
         Automaton<String> automaton = new Automaton<>(new_alphabet, new HashSet<>(this.statesMap.values()), transitions, this.deadEndTransitions);
         automaton.getStates().forEach(s -> s.setAutomatonId(automaton.getId()));
-        automaton.getTransitionFunction().forEach(t -> t.setAutomatonId(automaton.getId()));
+        automaton.getAllTransitions().forEach(t -> t.setAutomatonId(automaton.getId()));
         return automaton;
     }
 

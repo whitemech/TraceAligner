@@ -77,7 +77,7 @@ public class StripsEncoding extends AbstractEncoding {
         for (String l : this.all_symbols) {
             List<Transition<String>> temp = new ArrayList<>();
             for (Automaton<String> a : this.constraint_automata) {
-                temp.addAll(a.getTransitionFunction().stream().filter(t -> t.getSymbol().equals(l)).collect(Collectors.toList()));
+                temp.addAll(a.getAllTransitions().stream().filter(t -> t.getSymbol().equals(l)).collect(Collectors.toList()));
             }
             this.relevantTransitionsByLabel.put(l, temp);
         }
@@ -90,7 +90,8 @@ public class StripsEncoding extends AbstractEncoding {
     private void findCombTrans() {
         for (Map.Entry<String, List<Transition<String>>> entry : this.relevantTransitionsByLabel.entrySet()) {
             for (int i = 1; i <= this.nbAutomataPerLabel(entry.getValue()); i++) {
-                this.combTrans.addAll((List<CombinationOfTransitions>) Combinations.combinations(entry.getKey(), entry.getValue(), i, new HashSet<>()));
+                this.combTrans.addAll((List<CombinationOfTransitions>) Combinations.combinations(entry.getKey(),
+                        entry.getValue(), i, new HashSet<>()));
             }
         }
     }
@@ -502,7 +503,7 @@ public class StripsEncoding extends AbstractEncoding {
     public static void main(String[] args) {
         try {
             Set<AutomatonTemplate> templates = new HashSet<>();
-            try (Stream<String> lines = Files.lines(Paths.get("datasets/constraints/1-synth.ltlf"))) {
+            try (Stream<String> lines = Files.lines(Paths.get("ignore/models/s-models/10CONSTRAINTS/10constraints.ltlf"))) {
                 for (String line : (Iterable<String>) lines::iterator) {
                     String automaton_print = "";
                     automaton_print = LydiaAutomaton.callLydia(line, true);
@@ -510,7 +511,7 @@ public class StripsEncoding extends AbstractEncoding {
                 }
             }
 
-            XLog log = ParseLog.openLog("datasets/logs/synthetic-logs/10constraints/1-constraint-inverted/log-from-10constr-model-1constr_inverted-1.xes");
+            XLog log = ParseLog.openLog("ignore/logs/s-logs/10constraints/1-constraint-inverted/log-from-10constr-model-1constr_inverted-1.xes");
             int trace_nb = 0;
             for (XTrace trace : log) {
                 Trace t = new Trace(XConceptExtension.instance().extractName(trace));
@@ -561,9 +562,9 @@ public class StripsEncoding extends AbstractEncoding {
 //                final long t_gen_start = System.currentTimeMillis();
                 List<StringBuilder> res = se.generateString(trace_nb);
 //                List<Object> res = se.generate(trace_nb);
-                File problem_f = new File("output", String.format("p-%d.pddl", trace_nb));
+                File problem_f = new File("output", String.format("p-man-%d.pddl", trace_nb));
                 if (res.size() > 1) {
-                    File domain_f = new File("output", String.format("domain-%d.pddl", trace_nb));
+                    File domain_f = new File("output", String.format("d-man-%d.pddl", trace_nb));
                     FileUtils.writeStringToFile(domain_f, res.get(0).toString(), "utf-8");
                     FileUtils.writeStringToFile(problem_f, res.get(1).toString(), "utf-8");
                 } else {
