@@ -25,7 +25,6 @@ import trace_alignment.utils.CombinationOfStates;
 import trace_alignment.utils.CombinationOfTransitions;
 import trace_alignment.utils.Combinations;
 import trace_alignment.utils.Trace;
-import fr.uga.pddl4j.parser.*;
 import org.apache.commons.io.FileUtils;
 import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.extension.std.XLifecycleExtension;
@@ -49,7 +48,6 @@ public class StripsEncoding extends AbstractEncoding {
     private final Map<String, List<Transition<String>>> relevantTransitionsByLabel = new HashMap<>();
     private List<CombinationOfTransitions> combTrans = new ArrayList<>();
     private List<CombinationOfStates> combStates;
-    private HashMap<String, Symbol> mapping = new HashMap<>();
 
     public StripsEncoding(String name, Automaton<String> ta, Set<Automaton<String>> ca, List<CombinationOfStates> combStates, boolean onlyProblem) {
         super(name, ta, ca, onlyProblem);
