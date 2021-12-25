@@ -60,7 +60,6 @@ public class StripsEncoding extends AbstractEncoding {
         findAllSymbols();
         groupTransitionByLabel();
         findCombTrans();
-        computeMap();
     }
 
     /*
@@ -96,24 +95,6 @@ public class StripsEncoding extends AbstractEncoding {
         }
     }
 
-    private void computeMap() {
-        this.mapping.put("cur_state", new Symbol(Symbol.Kind.PREDICATE, "cur_state"));
-        this.mapping.put("state", new Symbol(Symbol.Kind.TYPE, "state"));
-        for (State st : this.trace_automaton.getStates()) {
-            this.mapping.put("t" + st.getName(), new Symbol(Symbol.Kind.CONSTANT, "t" + st.getName()));
-        }
-        for (Automaton<String> aut : this.constraint_automata) {
-            for (State sa : aut.getStates()) {
-                this.mapping.put(String.format("s_%s_%s", aut.getId(), sa.getName()), new Symbol(Symbol.Kind.CONSTANT,
-                        String.format("s_%s_%s", aut.getId(), sa.getName())));
-            }
-            if (aut.getAcceptStates().size() > 1) {
-                Symbol sym_goal = new Symbol(Symbol.Kind.CONSTANT, String.format("s_%s_goal", aut.getId()));
-                this.mapping.put(String.format("s_%s_goal", aut.getId()), sym_goal);
-            }
-        }
-    }
-
     private HashSet<Transition<String>> _select_ss_sync_transition(Transition<String> t) {
         HashSet<Transition<String>> ss = new HashSet<>();
         for (Automaton<String> a : this.constraint_automata) {
@@ -127,44 +108,6 @@ public class StripsEncoding extends AbstractEncoding {
             }
         }
         return ss;
-    }
-
-    private Op  _sync_completion(Transition<String> t) {
-        Symbol sync_name = new Symbol(Symbol.Kind.ACTION, String.format("sync-%s-t%st%s", t.getSymbol(),
-                t.getInputState().getName(), t.getOutputState().getName()));
-
-        /* Precondition */
-        Exp sync_pre = new Exp(Connective.AND);
-        Exp pre_cur_state_t = new Exp(Connective.ATOM);
-        pre_cur_state_t.setAtom(Arrays.asList(this.mapping.get("cur_state"),
-                this.mapping.get("t" + t.getInputState().getName())));
-        sync_pre.addChild(pre_cur_state_t);
-
-        HashSet<Transition<String>> ss_having_transition = _select_ss_sync_transition(t);
-        for (Transition<String> ts : ss_having_transition) {
-            Exp not_cur_states = new Exp(Connective.NOT);
-            Exp pre_cur_state_a = new Exp(Connective.ATOM);
-            pre_cur_state_a.setAtom(Arrays.asList(this.mapping.get("cur_state"),
-                    this.mapping.get(String.format("s_%s_%s",
-                            ts.getInputState().getAutomatonId(), ts.getInputState().getName()))));
-            not_cur_states.addChild(pre_cur_state_a);
-            sync_pre.addChild(not_cur_states);
-        }
-
-        /* Effects */
-        Exp sync_eff = new Exp(Connective.AND);
-        Exp not_cur_state_t = new Exp(Connective.NOT);
-        Exp eff_cur_state_t = new Exp(Connective.ATOM);
-        eff_cur_state_t.setAtom(Arrays.asList(this.mapping.get("cur_state"),
-                this.mapping.get(String.format("t%s", t.getInputState().getName()))));
-        not_cur_state_t.addChild(eff_cur_state_t);
-        sync_eff.addChild(not_cur_state_t);
-        Exp eff_cur_state_t2 = new Exp(Connective.ATOM);
-        eff_cur_state_t2.setAtom(Arrays.asList(this.mapping.get("cur_state"),
-                this.mapping.get(String.format("t%s", t.getOutputState().getName()))));
-        sync_eff.addChild(eff_cur_state_t2);
-
-        return new Op(sync_name, Collections.emptyList(), sync_pre, sync_eff);
     }
 
     private StringBuilder _sync_completionString(Transition<String> t, int nb) {
@@ -185,42 +128,6 @@ public class StripsEncoding extends AbstractEncoding {
         return sync;
     }
 
-    private Op _del_op(Transition<String> t) {
-        Symbol del_name = new Symbol(Symbol.Kind.ACTION, String.format("del-%s-t%st%s", t.getSymbol(), t.getInputState().getName(), t.getOutputState().getName()));
-
-        /* Precondition */
-        Exp del_pre = new Exp(Connective.AND);
-        Exp pre_cur_state_t = new Exp(Connective.ATOM);
-        pre_cur_state_t.setAtom(Arrays.asList(this.mapping.get("cur_state"),
-                this.mapping.get(String.format("t%s", t.getInputState().getName()))));
-        del_pre.addChild(pre_cur_state_t);
-
-        /* Effects */
-        Exp del_eff = new Exp(Connective.AND);
-
-        Exp del_cost = new Exp(Connective.INCREASE);
-        Exp cost_func = new Exp(Connective.FN_HEAD);
-        cost_func.setAtom(Collections.singletonList(new Symbol(Symbol.Kind.FUNCTOR, "total-cost")));
-        del_cost.addChild(cost_func);
-        Exp cost_num = new Exp(Connective.NUMBER);
-        cost_num.setValue(1.0);
-        del_cost.addChild(cost_num);
-        del_eff.addChild(del_cost);
-
-        Exp not_cur_state_t = new Exp(Connective.NOT);
-        Exp eff_cur_state_t = new Exp(Connective.ATOM);
-        eff_cur_state_t.setAtom(Arrays.asList(this.mapping.get("cur_state"),
-                this.mapping.get(String.format("t%s", t.getInputState().getName()))));
-        not_cur_state_t.addChild(eff_cur_state_t);
-        del_eff.addChild(not_cur_state_t);
-        Exp eff_cur_state_t2 = new Exp(Connective.ATOM);
-        eff_cur_state_t2.setAtom(Arrays.asList(this.mapping.get("cur_state"),
-                this.mapping.get(String.format("t%s", t.getOutputState().getName()))));
-        del_eff.addChild(eff_cur_state_t2);
-
-        return new Op(del_name, Collections.emptyList(), del_pre, del_eff);
-    }
-
     private StringBuilder _del_opString(Transition<String> t) {
         StringBuilder del = new StringBuilder(String.format("(:action del-%s-t%st%s\n", t.getSymbol(), t.getInputState().getName(), t.getOutputState().getName()));
         /* Precondition */
@@ -234,26 +141,8 @@ public class StripsEncoding extends AbstractEncoding {
         return del;
     }
 
-    private Op _goto_op(List<Exp> pre, Exp eff, int nb) {
-        Symbol goto_name = new Symbol(Symbol.Kind.ACTION, String.format("gotoGoal-c%d", nb));
-
-        /* Preconditions */
-        Exp goto_pre = new Exp(Connective.AND);
-        Exp trace = new Exp(Connective.ATOM);
-        trace.setAtom(Arrays.asList(this.mapping.get("cur_state"),
-                this.mapping.get(String.format("t%s",
-                        this.trace_automaton.getAcceptStates().get(0).getName()))));
-        goto_pre.addChild(trace);
-        for (Exp e : pre) {
-            goto_pre.addChild(e);
-        }
-
-        return new Op(goto_name, Collections.emptyList(), goto_pre, eff);
-    }
-
     private StringBuilder _goto_opString(List<String> pre, StringBuilder eff, int nb) {
         StringBuilder go_to = new StringBuilder(String.format("(:action gotoGoal-c%d\n", nb));
-
         /* Preconditions */
         go_to.append(":precondition (and ");
         go_to.append(String.format("(cur_state t%s) ", this.trace_automaton.getAcceptStates().get(0).getName()));
@@ -266,148 +155,6 @@ public class StripsEncoding extends AbstractEncoding {
         go_to.append("\n)\n\n");
 
         return go_to;
-    }
-
-    @Override
-    public Domain generateDomain() {
-        Domain d = new Domain(new Symbol(Symbol.Kind.DOMAIN, "alignment"));
-
-        /* Requirements */
-        d.addRequirement(RequireKey.TYPING);
-        d.addRequirement(RequireKey.ACTION_COSTS);
-
-        /* Types */
-        TypedSymbol state = new TypedSymbol(this.mapping.get("state"));
-        d.addType(state);
-
-        /* Predicates */
-        TypedSymbol s = new TypedSymbol(new Symbol(Symbol.Kind.VARIABLE, "?s"));
-        s.addType(this.mapping.get("state"));
-        NamedTypedList cur_state = new NamedTypedList(this.mapping.get("cur_state"));
-        cur_state.add(s);
-
-        d.addPredicate(cur_state);
-
-        /* Functions */
-        NamedTypedList total_cost = new NamedTypedList(new Symbol(Symbol.Kind.FUNCTOR, "total-cost"));
-        d.addFunction(total_cost);
-
-        /* Operators */
-//        add action for every combination
-//        sync action for every trace transition with event e for every combination with same event e
-//        sync action for every trace transition
-        HashSet<String> eventsInTrace = new HashSet<>();
-        int i = 0;
-        for (CombinationOfTransitions ct : this.combTrans) {
-            d.addOperator(ct.generateAdd(i, this.mapping));
-            for (Transition<String> tr : this.trace_automaton.getTransitionFunction()) {
-                if (tr.getSymbol().equals(ct.getLabel())) {
-                    eventsInTrace.add(ct.getLabel());
-                    d.addOperator(ct.generateSync(tr, i, this.mapping));
-                }
-            }
-            i++;
-        }
-
-//        del action for every trace transitions and sync completion
-        for (Transition<String> trace_tr : this.trace_automaton.getTransitionFunction()) {
-            d.addOperator(_sync_completion(trace_tr));
-            d.addOperator(_del_op(trace_tr));
-        }
-
-//        goto-abstract for abstract states
-        i = 0;
-        for (CombinationOfStates cs : this.combStates) {
-            d.addOperator(_goto_op(cs.generatePre(this.mapping), cs.generateEff(this.mapping), i));
-            i++;
-        }
-
-        return d;
-    }
-
-    private void _addTraceObjs(Problem p) {
-        for (State s : this.trace_automaton.getStates()) {
-            TypedSymbol ts = new TypedSymbol(new Symbol(Symbol.Kind.CONSTANT, "t" + s.getName()));
-            ts.addType(this.mapping.get("state"));
-            p.addObject(ts);
-        }
-    }
-
-    private void _addConstraintStateObjs(Problem p) {
-        for (Automaton<String> a : this.constraint_automata) {
-            for (State s : a.getStates()) {
-                TypedSymbol as = new TypedSymbol(new Symbol(Symbol.Kind.CONSTANT, String.format("s_%s_%s", a.getId(), s.getName())));
-                as.addType(this.mapping.get("state"));
-                p.addObject(as);
-            }
-            if (a.getAcceptStates().size() > 1) {
-                TypedSymbol agoal = new TypedSymbol(new Symbol(Symbol.Kind.CONSTANT, String.format("s_%s_goal",
-                        a.getId())));
-                agoal.addType(this.mapping.get("state"));
-                p.addObject(agoal);
-            }
-        }
-    }
-
-    private void _addInit(Problem p) {
-        Exp total_cost = new Exp(Connective.FN_ATOM);
-        Exp total_cost_hd = new Exp(Connective.FN_HEAD);
-        total_cost_hd.setAtom(Collections.singletonList(new Symbol(Symbol.Kind.FUNCTOR, "total-cost")));
-        Exp total_cost_nb = new Exp(Connective.NUMBER);
-        total_cost_nb.setValue(0.0);
-        total_cost.addChild(total_cost_hd);
-        total_cost.addChild(total_cost_nb);
-        p.addInitialFact(total_cost);
-
-        Exp cur_state = new Exp(Connective.ATOM);
-        cur_state.setAtom(Arrays.asList(this.mapping.get("cur_state"),
-                new Symbol(Symbol.Kind.CONSTANT, "t" + this.trace_automaton.getInitState().getName())));
-        p.addInitialFact(cur_state);
-        for (Automaton<String> a : this.constraint_automata) {
-            Exp a_cur_state = new Exp(Connective.ATOM);
-            a_cur_state.setAtom(Arrays.asList(this.mapping.get("cur_state"),
-                    new Symbol(Symbol.Kind.CONSTANT, String.format("s_%s_%s", a.getId(),
-                            a.getInitState().getName()))));
-            p.addInitialFact(a_cur_state);
-        }
-    }
-
-    private void _addGoal(Problem p) {
-        Exp goal_strips = new Exp(Connective.AND);
-        for (Automaton<String> a : this.constraint_automata) {
-            Exp a_cur_state = new Exp(Connective.ATOM);
-            if (a.getAcceptStates().size() > 1) {
-                a_cur_state.setAtom(Arrays.asList(this.mapping.get("cur_state"),
-                        new Symbol(Symbol.Kind.CONSTANT, String.format("s_%s_goal", a.getId()))));
-            } else {
-                a_cur_state.setAtom(Arrays.asList(this.mapping.get("cur_state"),
-                        new Symbol(Symbol.Kind.CONSTANT, String.format("s_%s_%s", a.getId(),
-                                a.getAcceptStates().get(0).getName()))));
-            }
-            goal_strips.addChild(a_cur_state);
-        }
-        Exp t_final = new Exp(Connective.ATOM);
-        t_final.setAtom(Arrays.asList(this.mapping.get("cur_state"),
-                new Symbol(Symbol.Kind.CONSTANT, "t" + this.trace_automaton.getAcceptStates().get(0).getName())));
-        goal_strips.addChild(t_final);
-        p.setGoal(goal_strips);
-
-        Exp metric = new Exp(Connective.MINIMIZE);
-        Exp total_cost_sym = new Exp(Connective.FN_HEAD);
-        total_cost_sym.setAtom(Collections.singletonList(new Symbol(Symbol.Kind.FUNCTOR, "total-cost")));
-        metric.addChild(total_cost_sym);
-        p.setMetric(metric);
-    }
-
-    @Override
-    public Problem generateProblem(int trace_id) {
-        Problem p = new Problem(new Symbol(Symbol.Kind.PROBLEM, "p-trace-" + trace_id));
-        p.setDomain(new Symbol(Symbol.Kind.DOMAIN, "alignment"));
-        _addTraceObjs(p);
-        _addConstraintStateObjs(p);
-        _addInit(p);
-        _addGoal(p);
-        return p;
     }
 
     @Override
@@ -425,7 +172,6 @@ public class StripsEncoding extends AbstractEncoding {
         /* Operators */
 //        add action for every combination
 //        sync action for every trace transition with event e for every combination with same event e
-//        sync action for every trace transition
         int i = 0;
         for (CombinationOfTransitions ct : this.combTrans) {
             PDDL_domain_buffer.append(ct.generateAddString(i));
@@ -441,7 +187,7 @@ public class StripsEncoding extends AbstractEncoding {
             PDDL_domain_buffer.append(_sync_completionString(trace_tr, i));
             PDDL_domain_buffer.append(_del_opString(trace_tr));
         }
-//        goto-abstract for abstract states
+//        goto-goal for dummy goal states
         i = 0;
         for (CombinationOfStates cs : this.combStates) {
             PDDL_domain_buffer.append(_goto_opString(cs.generatePreString(), cs.generateEffString(), i));
@@ -510,7 +256,6 @@ public class StripsEncoding extends AbstractEncoding {
                     templates.add(ParseLydiaDFA.parseMONAprint(automaton_print));
                 }
             }
-
             XLog log = ParseLog.openLog("ignore/logs/s-logs/10constraints/1-constraint-inverted/log-from-10constr-model-1constr_inverted-1.xes");
             int trace_nb = 0;
             for (XTrace trace : log) {
@@ -529,8 +274,6 @@ public class StripsEncoding extends AbstractEncoding {
                     Automaton<String> ins_aut = at.computeAutomatonNoDeadEnds(new HashSet<>(al_aut));
                     tempConstraint.add(ins_aut);
                 }
-
-
                 // Compute combination of states
                 List<CombinationOfStates> combStates = new ArrayList<>();
                 List<State> acceptStates = new ArrayList<>();
@@ -544,24 +287,9 @@ public class StripsEncoding extends AbstractEncoding {
                 if (acceptStates.size() > 0) {
                     combStates = (List<CombinationOfStates>) Combinations.combinations(acceptStates, k, _singletonFinal(tempConstraint));
                 }
-
-
                 StripsEncoding se = new StripsEncoding("strips-conj", trace_aut, tempConstraint, combStates, false);
-//            Map<String, List<Transition<String>>> rtbl = se.relevantTransitionsByLabel;
                 System.out.println(se.combTrans);
-//                System.out.println(se.combStates);
-
-//                System.out.println("combinations...");
-//                final long t_trans_start = System.currentTimeMillis();
-//                System.out.println(se.combTrans.size());
-//                final long t_trans_end = System.currentTimeMillis();
-//                final long t_states_start = System.currentTimeMillis();
-//                System.out.println(se.combStates.size());
-//                final long t_states_end = System.currentTimeMillis();
-//                System.out.println(String.format("trans in %d ms, states in %d ms, starting generation", t_trans_end - t_trans_start, t_states_end - t_states_start));
-//                final long t_gen_start = System.currentTimeMillis();
                 List<StringBuilder> res = se.generateString(trace_nb);
-//                List<Object> res = se.generate(trace_nb);
                 File problem_f = new File("output", String.format("p-man-%d.pddl", trace_nb));
                 if (res.size() > 1) {
                     File domain_f = new File("output", String.format("d-man-%d.pddl", trace_nb));
@@ -570,31 +298,7 @@ public class StripsEncoding extends AbstractEncoding {
                 } else {
                     FileUtils.writeStringToFile(problem_f, res.get(0).toString(), "utf-8");
                 }
-//                final long t_gen_end = System.currentTimeMillis();
-//                System.out.println(String.format("Domain and Problem for trace %d generated in %d ms", trace_nb, t_gen_end - t_gen_start));
                 trace_nb++;
-
-//                StripsEncoding se = new StripsEncoding("strips-conj", trace_aut, tempConstraint, combStates, false);
-//                Map<String, List<Transition<String>>> rtbl = se.relevantTransitionsByLabel;
-//                System.out.println(se.combTrans);
-
-//                System.out.println("combinations...");
-//                final long t_trans_start = System.currentTimeMillis();
-//                System.out.println(se.combTrans.size());
-//                final long t_trans_end = System.currentTimeMillis();
-//                final long t_states_start = System.currentTimeMillis();
-//                System.out.println(se.combStates.size());
-//                final long t_states_end = System.currentTimeMillis();
-//                System.out.println(String.format("trans in %d ms, states in %d ms, starting generation", t_trans_end - t_trans_start, t_states_end - t_states_start));
-//                final long t_gen_start = System.currentTimeMillis();
-//                List<StringBuilder> res = se.generateString(trace_nb);
-//                StringBuilder domain = res.get(0);
-//                System.out.println(domain);
-//                Domain d = (Domain) res.get(0);
-//                Problem p = (Problem) res.get(1);
-//                final long t_gen_end = System.currentTimeMillis();
-//                System.out.println(String.format("Domain and Problem for trace %d generated in %d ms", trace_nb, t_gen_end - t_gen_start));
-//                trace_nb++;
             }
         } catch (Exception e) {
             e.printStackTrace();

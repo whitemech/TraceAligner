@@ -34,8 +34,8 @@ import java.util.function.Predicate;
 public class CombinationOfTransitions {
     private final String label;
     private final int length;
-    private HashSet<Transition<String>> inTransitions;
-    private HashSet<Transition<String>> outTransitions;
+    private final HashSet<Transition<String>> inTransitions;
+    private final HashSet<Transition<String>> outTransitions;
 
     public CombinationOfTransitions(String label, int length, HashSet<Transition<String>> inTransitions, HashSet<Transition<String>> outTransitions) {
         this.label = label;
@@ -61,59 +61,6 @@ public class CombinationOfTransitions {
 
     public HashSet<Transition<String>> getOutTransitions() {
         return outTransitions;
-    }
-
-    public Op generateAdd(int nb, HashMap<String, Symbol> mapping) {
-        Symbol add_name = new Symbol(Symbol.Kind.ACTION, String.format("add-%s-c%d", this.label, nb));
-
-        /* Preconditions */
-        Exp add_pre = new Exp(Connective.AND);
-        Set<Transition<String>> combined = new HashSet<>(this.inTransitions);
-        combined.addAll(this.outTransitions);
-        for (Transition<String> t : combined) {
-            Exp pre_cur_state = new Exp(Connective.ATOM);
-            pre_cur_state.setAtom(Arrays.asList(mapping.get("cur_state"),
-                    mapping.get(String.format("s_%s_%s",
-                            t.getInputState().getAutomatonId(), t.getInputState().getName()))));
-            if (this.inTransitions.contains(t)) {
-                add_pre.addChild(pre_cur_state);
-            }
-            else {
-                assert this.outTransitions.contains(t);
-                Exp not_cur_states = new Exp(Connective.NOT);
-                not_cur_states.addChild(pre_cur_state);
-                add_pre.addChild(not_cur_states);
-            }
-        }
-
-        /* Effects */
-        Exp add_eff = new Exp(Connective.AND);
-
-        Exp add_cost = new Exp(Connective.INCREASE);
-        Exp cost_func = new Exp(Connective.FN_HEAD);
-        cost_func.setAtom(Collections.singletonList(new Symbol(Symbol.Kind.FUNCTOR, "total-cost")));
-        add_cost.addChild(cost_func);
-        Exp cost_num = new Exp(Connective.NUMBER);
-        cost_num.setValue(1.0);
-        add_cost.addChild(cost_num);
-        add_eff.addChild(add_cost);
-
-        for (Transition<String> t : this.inTransitions) {
-            Exp not_cur_states = new Exp(Connective.NOT);
-            Exp eff_cur_state_not = new Exp(Connective.ATOM);
-            eff_cur_state_not.setAtom(Arrays.asList(mapping.get("cur_state"),
-                    mapping.get(String.format("s_%s_%s",
-                            t.getOutputState().getAutomatonId(), t.getInputState().getName()))));
-            not_cur_states.addChild(eff_cur_state_not);
-            Exp eff_cur_state = new Exp(Connective.ATOM);
-            eff_cur_state.setAtom(Arrays.asList(mapping.get("cur_state"),
-                    mapping.get(String.format("s_%s_%s",
-                            t.getOutputState().getAutomatonId(), t.getOutputState().getName()))));
-            add_eff.addChild(not_cur_states);
-            add_eff.addChild(eff_cur_state);
-        }
-
-        return new Op(add_name, Collections.emptyList(), add_pre, add_eff);
     }
 
     public StringBuilder generateAddString(int nb) {
@@ -145,61 +92,6 @@ public class CombinationOfTransitions {
         }
         add.append(")\n)\n\n");
         return add;
-    }
-
-    public Op generateSync(Transition<String> tr, int nb, HashMap<String, Symbol> mapping) {
-        Symbol add_name = new Symbol(Symbol.Kind.ACTION, String.format("sync-%s-c%d", this.label, nb));
-
-        /* Preconditions */
-        Exp add_pre = new Exp(Connective.AND);
-        Set<Transition<String>> combined = new HashSet<>(this.inTransitions);
-        combined.addAll(this.outTransitions);
-        for (Transition<String> t : combined) {
-            Exp pre_cur_state = new Exp(Connective.ATOM);
-            pre_cur_state.setAtom(Arrays.asList(mapping.get("cur_state"),
-                    mapping.get(String.format("s_%s_%s",
-                            t.getInputState().getAutomatonId(), t.getInputState().getName()))));
-            if (this.inTransitions.contains(t)) {
-                add_pre.addChild(pre_cur_state);
-            }
-            else {
-                assert this.outTransitions.contains(t);
-                Exp not_cur_states = new Exp(Connective.NOT);
-                not_cur_states.addChild(pre_cur_state);
-                add_pre.addChild(not_cur_states);
-            }
-        }
-        Exp pre_trace_state = new Exp(Connective.ATOM);
-        pre_trace_state.setAtom(Arrays.asList(mapping.get("cur_state"),
-                mapping.get("t" + tr.getInputState().getName())));
-        add_pre.addChild(pre_trace_state);
-
-        /* Effects */
-        Exp add_eff = new Exp(Connective.AND);
-
-        for (Transition<String> t : this.inTransitions) {
-            Exp not_cur_states = new Exp(Connective.NOT);
-            Exp eff_cur_state_not = new Exp(Connective.ATOM);
-            eff_cur_state_not.setAtom(Arrays.asList(mapping.get("cur_state"),
-                    mapping.get(String.format("s_%s_%s",
-                            t.getOutputState().getAutomatonId(), t.getInputState().getName()))));
-            not_cur_states.addChild(eff_cur_state_not);
-            Exp eff_cur_state = new Exp(Connective.ATOM);
-            eff_cur_state.setAtom(Arrays.asList(mapping.get("cur_state"),
-                    mapping.get(String.format("s_%s_%s",
-                            t.getOutputState().getAutomatonId(), t.getOutputState().getName()))));
-            add_eff.addChild(not_cur_states);
-            add_eff.addChild(eff_cur_state);
-        }
-        Exp eff_trace_state = new Exp(Connective.ATOM);
-        eff_trace_state.setAtom(Arrays.asList(mapping.get("cur_state"),
-                mapping.get("t" + tr.getOutputState().getName())));
-        add_eff.addChild(eff_trace_state);
-        Exp not_eff_trace_state = new Exp(Connective.NOT);
-        not_eff_trace_state.addChild(pre_trace_state);
-        add_eff.addChild(not_eff_trace_state);
-
-        return new Op(add_name, Collections.emptyList(), add_pre, add_eff);
     }
 
     public StringBuilder generateSyncString(Transition<String> tr, int nb) {
@@ -242,10 +134,5 @@ public class CombinationOfTransitions {
                 ", inTransitions=" + inTransitions +
                 ", outTransitions=" + outTransitions +
                 "}\n";
-    }
-
-    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return t -> seen.add(keyExtractor.apply(t));
     }
 }

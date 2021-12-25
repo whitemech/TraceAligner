@@ -228,13 +228,7 @@ public class App implements Runnable {
                             default:
                                 throw new IllegalStateException("Unexpected value: " + Encoding.get(e));
                         }
-                        List<?> res;
-                        if (Encoding.get(e).equals(Encoding.STRIPS_CONJ)) {
-                            res = enc.generateString(trace_nb);
-                        }
-                        else {
-                            res = enc.generate(trace_nb);
-                        }
+                        List<?> res = enc.generateString(trace_nb);
                         File problem_f = new File(output_location, String.format("p-%d.pddl", trace_nb));
                         if (res.size() > 1) {
                             File domain_f = new File(output_location, String.format("domain-%d.pddl", trace_nb));

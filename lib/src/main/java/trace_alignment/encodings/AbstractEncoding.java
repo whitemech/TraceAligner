@@ -46,20 +46,8 @@ public abstract class AbstractEncoding {
         }
     }
 
-    abstract public Domain generateDomain();
-    abstract public Problem generateProblem(int trace_id);
-
     abstract public StringBuilder generateDomainString();
     abstract public StringBuilder generateProblemString(int trace_id);
-
-    public List<Object> generate(int trace_id) {
-        List<Object> result = new ArrayList<>();
-        if (! this.onlyProblem) {
-            result.add(this.generateDomain());
-        }
-        result.add(this.generateProblem(trace_id));
-        return result;
-    }
 
     public List<StringBuilder> generateString(int trace_id) {
         List<StringBuilder> result = new ArrayList<>();
