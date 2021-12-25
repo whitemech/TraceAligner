@@ -31,6 +31,10 @@ public class Combinations {
         return comb.stream().map(T::getAutomatonId).collect(Collectors.toSet());
     }
 
+    private static <T extends AutomatonComponents> boolean _deadEndInCombination(Set<Transition<T>> comb) {
+        return comb.stream().anyMatch(t -> t.getOutputState().getName().equals("ink"));
+    }
+
     public static <T extends AutomatonComponents> ArrayList<?> combinations(List<T> l, int k, HashSet<State> s) {
         return combinations("", l, k, s);
     }
@@ -52,7 +56,7 @@ public class Combinations {
             // forward step if i <= (N + (r-K))
             if (i <= (n + (r - k))) {
                 pointers[r] = i;
-                // if combination array is full set and increment i;
+                // if combination array is full, set and increment i;
                 if (r == k - 1) {
                     Set<T> combination = Arrays.stream(pointers).mapToObj(l::get).collect(Collectors.toSet());
                     Set<String> distinctAutomata = _distictAutomata(combination);
@@ -61,10 +65,12 @@ public class Combinations {
                             combStates.add(new CombinationOfStates((HashSet<State>) combination, s,
                                     (HashSet<String>) distinctAutomata));
                         } else {
-                            HashSet<T> reminder = new HashSet<>(l);
-                            reminder.removeIf(combination::contains);
-                            combTrans.add(new CombinationOfTransitions(label, k,
-                                    (HashSet<Transition<String>>) combination, (HashSet<Transition<String>>) reminder));
+                            if (!_deadEndInCombination((HashSet<Transition<T>>) combination)) {
+                                HashSet<T> reminder = new HashSet<>(l);
+                                reminder.removeIf(combination::contains);
+                                combTrans.add(new CombinationOfTransitions(label, k,
+                                        (HashSet<Transition<String>>) combination, (HashSet<Transition<String>>) reminder));
+                            }
                         }
                     }
                     i++;

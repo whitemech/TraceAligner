@@ -142,11 +142,6 @@ public class CombinationOfTransitions {
                 add.append(String.format("(cur_state s_%s_%s) ",
                         t.getOutputState().getAutomatonId(), t.getOutputState().getName()));
             }
-            else {
-                assert this.outTransitions.contains(t);
-                add.append(String.format("(not (cur_state s_%s_%s)) ",
-                        t.getOutputState().getAutomatonId(), t.getOutputState().getName()));
-            }
         }
         add.append(")\n)\n\n");
         return add;
@@ -230,11 +225,6 @@ public class CombinationOfTransitions {
                 sync.append(String.format("(not (cur_state s_%s_%s)) ",
                         t.getInputState().getAutomatonId(), t.getInputState().getName()));
                 sync.append(String.format("(cur_state s_%s_%s) ",
-                        t.getOutputState().getAutomatonId(), t.getOutputState().getName()));
-            }
-            else {
-                assert this.outTransitions.contains(t);
-                sync.append(String.format("(not (cur_state s_%s_%s)) ",
                         t.getOutputState().getAutomatonId(), t.getOutputState().getName()));
             }
         }

@@ -79,4 +79,36 @@ class ParseLydiaDFATest {
         Assertions.assertEquals(expected, response_actual);
     }
 
+    @Test
+    void parseMONAprintChainPrecedence() throws IOException {
+
+        String response_str = LydiaAutomaton.callLydia("G(X[!]a -> b) & (!a)", true);
+        AutomatonTemplate response_actual = ParseLydiaDFA.parseMONAprint(response_str);
+
+        List<String> al = Arrays.asList("a", "b");
+        Set<String> ts = new HashSet<>(Arrays.asList("0,01,1", "0,10,2", "1,10,0", "1,00,0"));
+        Set<Integer> ss = new HashSet<>(Arrays.asList(0, 1, 2));
+        Set<Integer> acc = new HashSet<>(Arrays.asList(0, 1));
+
+        AutomatonTemplate expected = new AutomatonTemplate(al, ts, ss, 0, acc);
+
+        Assertions.assertEquals(expected, response_actual);
+    }
+
+    @Test
+    void parseMONAprintNotCoExistence() throws IOException {
+
+        String response_str = LydiaAutomaton.callLydia("!(F(a) & F(b))", true);
+        AutomatonTemplate response_actual = ParseLydiaDFA.parseMONAprint(response_str);
+
+        List<String> al = Arrays.asList("a", "b");
+        Set<String> ts = new HashSet<>(Arrays.asList("0,01,1", "0,10,2", "1,10,3", "2,01,3"));
+        Set<Integer> ss = new HashSet<>(Arrays.asList(0, 1, 2, 3));
+        Set<Integer> acc = new HashSet<>(Arrays.asList(0, 1, 2));
+
+        AutomatonTemplate expected = new AutomatonTemplate(al, ts, ss, 0, acc);
+
+        Assertions.assertEquals(expected, response_actual);
+    }
+
 }

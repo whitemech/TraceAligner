@@ -75,6 +75,12 @@ public class Automaton<T> {
         return dead_ends;
     }
 
+    public Set<Transition<T>> getAllTransitions() {
+        Set<Transition<T>> allTransitions = this.getTransitionFunction();
+        allTransitions.addAll(this.getDead_ends());
+        return allTransitions;
+    }
+
     public List<State> getAcceptStates(){
         return states.stream().filter(State::isAcceptState)
                 .collect(Collectors.toList());
