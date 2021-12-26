@@ -57,19 +57,19 @@ public class GeneralEncoding extends AbstractEncoding {
         PDDL_domain_buffer.append(":effect (and (not (cur_state ?t1)) (cur_state ?t2)\n" +
                 "\t\t(forall (?s1 ?s2 - automaton_state)\n" +
                 "\t\t\t(when (and (cur_state ?s1) (automaton ?s1 ?e ?s2))\n" +
-                "\t\t\t\t(and (not (cur_state ?s1))(cur_state ?s2)))\n)\n)\n)\n");
+                "\t\t\t\t(and (not (cur_state ?s1)) (cur_state ?s2)))\n)\n)\n)\n");
         /* Add Operator */
         PDDL_domain_buffer.append("(:action add\n");
         PDDL_domain_buffer.append(":parameters (?e - activity)\n");
-        PDDL_domain_buffer.append(":precondition (and (cur_state ?t1)(trace ?t1 ?e ?t2))\n");
+        PDDL_domain_buffer.append(":precondition (and (cur_state ?t1) (trace ?t1 ?e ?t2))\n");
         PDDL_domain_buffer.append(":effect (and (increase (total-cost) 1)\n" +
                 "\t\t(forall (?s1 ?s2 - automaton_state)\n" +
                 "\t\t\t(when (and (cur_state ?s1) (automaton ?s1 ?e ?s2))\n" +
-                "\t\t\t\t(and (not (cur_state ?s1))(cur_state ?s2)))\n)\n)\n)\n");
+                "\t\t\t\t(and (not (cur_state ?s1)) (cur_state ?s2)))\n)\n)\n)\n");
         /* Del Operator */
-        PDDL_domain_buffer.append("(:action add\n");
+        PDDL_domain_buffer.append("(:action del\n");
         PDDL_domain_buffer.append(":parameters (?t1 - trace_state ?e - activity ?t2 - trace_state)\n");
-        PDDL_domain_buffer.append(":precondition (and (cur_state ?t1)(trace ?t1 ?e ?t2))\n");
+        PDDL_domain_buffer.append(":precondition (and (cur_state ?t1) (trace ?t1 ?e ?t2))\n");
         PDDL_domain_buffer.append(":effect (and (increase (total-cost) 1) (not (cur_state ?t1)) (cur_state ?t2)\n)" +
                 "\n)\n");
         PDDL_domain_buffer.append(")");
