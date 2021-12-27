@@ -19,8 +19,6 @@
 package trace_alignment.encodings;
 
 import trace_alignment.automaton.Automaton;
-import fr.uga.pddl4j.parser.Domain;
-import fr.uga.pddl4j.parser.Problem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +26,6 @@ import java.util.Set;
 
 public abstract class AbstractEncoding {
     private final String name;
-    private Domain domain;
-    private Problem problem;
     private boolean onlyProblem;
 
     private final Automaton<String> traceAutomaton;
@@ -46,20 +42,8 @@ public abstract class AbstractEncoding {
         }
     }
 
-    abstract public Domain generateDomain();
-    abstract public Problem generateProblem(int trace_id);
-
     abstract public StringBuilder generateDomainString();
     abstract public StringBuilder generateProblemString(int trace_id);
-
-    public List<Object> generate(int trace_id) {
-        List<Object> result = new ArrayList<>();
-        if (! this.onlyProblem) {
-            result.add(this.generateDomain());
-        }
-        result.add(this.generateProblem(trace_id));
-        return result;
-    }
 
     public List<StringBuilder> generateString(int trace_id) {
         List<StringBuilder> result = new ArrayList<>();
@@ -72,13 +56,5 @@ public abstract class AbstractEncoding {
 
     public String getName() {
         return name;
-    }
-
-    public Domain getDomain() {
-        return domain;
-    }
-
-    public Problem getProblem() {
-        return problem;
     }
 }
