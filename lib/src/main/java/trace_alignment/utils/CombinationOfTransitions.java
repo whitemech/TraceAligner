@@ -21,15 +21,8 @@
 package trace_alignment.utils;
 
 import trace_alignment.automaton.Transition;
-import fr.uga.pddl4j.parser.Connective;
-import fr.uga.pddl4j.parser.Exp;
-import fr.uga.pddl4j.parser.Op;
-import fr.uga.pddl4j.parser.Symbol;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class CombinationOfTransitions {
     private final String label;

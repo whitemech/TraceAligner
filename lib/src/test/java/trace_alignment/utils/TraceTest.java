@@ -20,7 +20,9 @@ package trace_alignment.utils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import trace_alignment.automaton.State;
 import trace_alignment.automaton.TraceAutomaton;
+import trace_alignment.automaton.Transition;
 import trace_alignment.parsing.ParseLog;
 import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.extension.std.XLifecycleExtension;
