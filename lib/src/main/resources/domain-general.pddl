@@ -12,7 +12,7 @@
     (:action sync
         :parameters (?t1 - trace_state ?e - activity ?t2 - trace_state)
         :precondition (and (cur_state ?t1)(trace ?t1 ?e ?t2))
-        :effect(and
+        :effect (and
                     (not (cur_state ?t1))
                     (cur_state ?t2)
                     (forall (?s1 ?s2 - automaton_state)
