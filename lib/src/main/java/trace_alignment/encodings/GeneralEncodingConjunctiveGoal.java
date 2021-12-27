@@ -61,8 +61,8 @@ public class GeneralEncodingConjunctiveGoal extends AbstractEncoding {
                 "\t\t\t\t(and (not (cur_state ?s1)) (cur_state ?s2)))\n)\n)\n)\n");
         /* Add Operator */
         PDDL_domain_buffer.append("(:action add\n");
-        PDDL_domain_buffer.append(":parameters (?t1 - trace_state ?e - act ?t2 - trace_state)\n");
-        PDDL_domain_buffer.append(":precondition (and (cur_state ?t1) (trace ?t1 ?e ?t2))\n");
+        PDDL_domain_buffer.append(":parameters (?e - act)\n");
+        PDDL_domain_buffer.append(":precondition (and)\n");
         PDDL_domain_buffer.append(":effect (and (increase (total-cost) 1)\n" +
                 "\t\t(forall (?s1 ?s2 - automaton_state)\n" +
                 "\t\t\t(when (and (cur_state ?s1) (automaton ?s1 ?e ?s2))\n" +
@@ -77,7 +77,7 @@ public class GeneralEncodingConjunctiveGoal extends AbstractEncoding {
         PDDL_domain_buffer.append("(:action goto-goal\n");
         PDDL_domain_buffer.append(":parameters (?t1 - trace_state ?de - dummy_act)\n");
         PDDL_domain_buffer.append(":precondition (and (cur_state ?t1) (final_state ?t1))\n");
-        PDDL_domain_buffer.append(":effect (and (increase (total-cost) 1)\n" +
+        PDDL_domain_buffer.append(":effect (and\n" +
                 "\t\t(forall (?s1 ?s2 - automaton_state)\n" +
                 "\t\t\t(when (and (cur_state ?s1) (dummy_trans ?s1 ?de ?s2))\n" +
                 "\t\t\t\t(and (not (cur_state ?s1)) (cur_state ?s2)))\n)\n)\n)\n");

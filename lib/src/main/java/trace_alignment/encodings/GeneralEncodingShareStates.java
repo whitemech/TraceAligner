@@ -61,8 +61,8 @@ public class GeneralEncodingShareStates extends AbstractEncoding {
                 "\t\t\t\t(and (not (cur_state ?a ?s1)) (cur_state ?a ?s2)))\n)\n)\n)\n");
         /* Add Operator */
         PDDL_domain_buffer.append("(:action add\n");
-        PDDL_domain_buffer.append(":parameters (?t1 - trace_state ?e - activity ?t2 - trace_state)\n");
-        PDDL_domain_buffer.append(":precondition (and (cur_state_trace ?t1) (trace_trans ?t1 ?e ?t2))\n");
+        PDDL_domain_buffer.append(":parameters (?e - activity)\n");
+        PDDL_domain_buffer.append(":precondition (and)\n");
         PDDL_domain_buffer.append(":effect (and (increase (total-cost) 1)\n" +
                 "\t\t(forall (?a - automaton ?s1 ?s2 - automaton_state)\n" +
                 "\t\t\t(when (and (cur_state ?a ?s1) (automaton_trans ?a ?s1 ?e ?s2))\n" +
@@ -136,7 +136,7 @@ public class GeneralEncodingShareStates extends AbstractEncoding {
                         .append(" ")
                         .append(trans.getSymbol())
                         .append(" ")
-                        .append(" s").append(trans.getOutputState().getName())
+                        .append("s").append(trans.getOutputState().getName())
                         .append(")\n");
             }
         }
