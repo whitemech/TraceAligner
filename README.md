@@ -41,14 +41,14 @@ We use Gradle as a build tool. Please
 check the [official website](https://gradle.org/)
 to download it for your platform.
 
-### Lydia, PDDL4J 
+### OpenXES, Lydia 
 
-The project depends on the following libraries, which are already imported by Gradle:
-- Lydia: for the translation of LTLf/LDLf formulas to DFA
-- PDDL4J: for PDDL manipulations
+The project depends on the following libraries:
+- OpenXES: to handle XES logs;
+- Lydia: for the translation of LTLf/LDLf formulas to DFA.
 
-To install Lydia, please refer to its [official repository](https://github.com/whitemech/lydia).
-PDDL4J, instead, is included in this repository within the `third_party` folder. 
+OpenXES is already included in this repository within the `third_party` folder.
+Instead, to install Lydia, please refer to its [official repository](https://github.com/whitemech/lydia).
 
 ## Installation
 
@@ -56,8 +56,7 @@ PDDL4J, instead, is included in this repository within the `third_party` folder.
 
 To build from source, clone the repository:
 ```
-git clone https://github.com/fabio-patrizi/trace-alignment.git
-cd trace-alignment/code
+git clone https://github.com/whitemech/trace-alignment.git
 ```
 
 To build and run tests:
