@@ -1,6 +1,6 @@
-# Trace-Alignment Code
+# Trace-Alignment
 
-[![Trace-Alignment Code CI](https://github.com/whitemech/trace-alignment/actions/workflows/javapackage.yml/badge.svg)](https://github.com/whitemech/trace-alignment/actions/workflows/javapackage.yml)
+[![Trace-Alignment CI](https://github.com/whitemech/trace-alignment/actions/workflows/javapackage.yml/badge.svg)](https://github.com/whitemech/trace-alignment/actions/workflows/javapackage.yml)
 
 This tool aligns log traces for Business Process Mining using Automated Planning techniques.
 
