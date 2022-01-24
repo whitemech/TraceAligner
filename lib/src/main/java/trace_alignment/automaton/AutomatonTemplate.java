@@ -18,6 +18,8 @@
 
 package trace_alignment.automaton;
 
+import com.google.common.collect.Sets;
+
 import java.util.*;
 
 public class AutomatonTemplate {
@@ -30,6 +32,9 @@ public class AutomatonTemplate {
     private final HashMap<Integer, State> statesMap = new HashMap<>();
     private final Set<Transition<String>> deadEndTransitions = new HashSet<>();
 
+    private final Set<String> deadEnds = new HashSet<>();
+    private final Set<String> seenActivities = new HashSet<>();
+
     public AutomatonTemplate(List<String> alphabet, Set<String> transitions, Set<Integer> states, int init, Set<Integer> accepting) {
         this.alphabet = alphabet;
         this.transitions = transitions;
@@ -38,6 +43,16 @@ public class AutomatonTemplate {
         this.accepting_states = accepting;
         for (Integer s : this.states) {
             this.statesMap.put(s, new State(String.valueOf(s), this.init.equals(s), this.accepting_states.contains(s)));
+        }
+    }
+
+    private void updateDeadEndsTrans(Sets.SetView<String> diff) {
+        for (String t : this.deadEnds) {
+            String[] split_t = t.split(",");
+            for (String act: diff) {
+                this.deadEndTransitions.add(new Transition<>(this.statesMap.get(Integer.parseInt(split_t[0])
+                ), act, this.statesMap.get(-1)));
+            }
         }
     }
 
@@ -53,25 +68,23 @@ public class AutomatonTemplate {
         if (to_trim.size() != 0) {
             Integer state_to_trim = to_trim.iterator().next();
             this.statesMap.remove(state_to_trim);
-        }
 
-        HashSet<String> newTransitions = new HashSet<>(this.transitions);
-        for (String t : this.transitions) {
-            String[] split_t = t.split(",");
-            int sum = 0;
-            for (int i=0; i<split_t[1].length(); i++) {
-                char ch = split_t[1].charAt(i);
-                sum += Integer.parseInt(String.valueOf(ch));
-            }
-            if (! noSink.contains(Integer.parseInt(split_t[2]))) {
-                State sink = new State("ink", false, false);
-                if (sum > 1) {
-                    continue;
+            HashSet<String> newTransitions = new HashSet<>(this.transitions);
+            for (String t : this.transitions) {
+                String[] split_t = t.split(",");
+                int sum = 0;
+                for (int i=0; i<split_t[1].length(); i++) {
+                    char ch = split_t[1].charAt(i);
+                    sum += Integer.parseInt(String.valueOf(ch));
                 }
-                else {
-                    // either sum = 0 or sum = 1
-                    // we save a transition for every symbol of the trace alphabet not appearing in the automaton alphabet
-                    if (sum == 0) {
+                if (! noSink.contains(Integer.parseInt(split_t[2]))) {
+                    State sink = new State("ink", false, false);
+                    this.statesMap.put(-1, sink);
+                    if (sum > 1) {
+                        continue;
+                    }
+                    else if (sum == 0) {
+                        this.deadEnds.add(t);
                         HashSet<String> setDifference = new HashSet<>(traceAlphabet);
                         this.alphabet.forEach(setDifference::remove);
                         for (String s : setDifference) {
@@ -80,6 +93,7 @@ public class AutomatonTemplate {
                                     ), s, sink)
                             );
                         }
+                        seenActivities.addAll(setDifference);
                     }
                     else {
                         this.deadEndTransitions.add(
@@ -88,16 +102,21 @@ public class AutomatonTemplate {
                                         sink)
                         );
                     }
+                    newTransitions.remove(t);
                 }
-                newTransitions.remove(t);
             }
+            this.transitions.retainAll(newTransitions);
         }
-        this.transitions.retainAll(newTransitions);
     }
 
     public Automaton<String> computeAutomatonNoDeadEnds(Set<String> traceAlphabet) {
         this._trimming(traceAlphabet);
         this.alphabet.forEach(traceAlphabet::remove);
+        Sets.SetView<String> difference = Sets.difference(traceAlphabet, this.seenActivities);
+        if (difference.size() != 0) {
+            this.updateDeadEndsTrans(difference);
+            this.seenActivities.addAll(difference);
+        }
         Set<Transition<String>> transitions = new HashSet<>();
         for (String t : this.transitions) {
             String[] _t = t.split(",");
@@ -114,7 +133,8 @@ public class AutomatonTemplate {
         }
         HashSet<String> new_alphabet = new HashSet<>(this.alphabet);
         new_alphabet.addAll(traceAlphabet);
-        Automaton<String> automaton = new Automaton<>(new_alphabet, new HashSet<>(this.statesMap.values()), transitions, this.deadEndTransitions);
+        Automaton<String> automaton = new Automaton<>(new_alphabet, new HashSet<>(this.statesMap.values()), transitions,
+                this.deadEndTransitions);
         automaton.getStates().forEach(s -> s.setAutomatonId(automaton.getId()));
         automaton.getAllTransitions().forEach(t -> t.setAutomatonId(automaton.getId()));
         return automaton;

@@ -43,10 +43,7 @@ repositories {
 }
 
 dependencies {
-    //implementation 'com.google.guava:guava:29.0-jre'
     api fileTree(dir: '../third_party', include: '*.jar')
-    // implementation group: 'net.sf.tweety.logics', name: 'pl', version: '1.4'
-    //implementation 'com.github.pellierd:pddl4j:3.8'
     implementation 'commons-io:commons-io:2.8.0'
 
     // ANTLR
@@ -72,16 +69,3 @@ test {
         }
     }
 }
-
-//tasks.withType(Checkstyle) {
-//    reports {
-//        xml.enabled false
-//        html.enabled true
-//        html.stylesheet resources.text.fromFile('${project.rootDir}/config/xsl/checkstyle-custom.xsl')
-//    }
-//}
-//pmd {
-//    consoleOutput = true
-//    toolVersion = "6.31.0"
-//    ruleSets = ["${project.rootDir}/category/java/errorprone.xml", "${project.rootDir}/category/java/bestpractices.xml"]
-//}
