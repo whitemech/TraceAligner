@@ -244,7 +244,6 @@ public class App implements Runnable {
                 final long t_total_compilation = t_compilation_end - t_compilation_start;
                 final long t_wall_clock = t_compilation_end - t_log_start;
                 if (!quiet) {
-//                    logger.info("Computing PDDL domain and problems for each log trace ... Done!");
                     logger.info(String.format("Compilation done in: %d ms", t_total_compilation));
                     logger.info(String.format("Total time DFAs + Compilation: %d ms", t_compilation_end - t_automata_start));
                     logger.info(String.format("Total wall-clock time: %d ms", t_wall_clock));

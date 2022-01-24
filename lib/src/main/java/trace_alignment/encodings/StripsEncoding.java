@@ -108,8 +108,9 @@ public class StripsEncoding extends AbstractEncoding {
         return ss;
     }
 
-    private StringBuilder _sync_completionString(Transition<String> t, int nb) {
-        StringBuilder sync = new StringBuilder(String.format("(:action sync-%s-t%d\n", t.getSymbol(), nb));
+    private StringBuilder _sync_completionString(Transition<String> t) {
+        StringBuilder sync = new StringBuilder(String.format("(:action sync-%s-t%st%s\n", t.getSymbol(),
+                t.getInputState().getName(), t.getOutputState().getName()));
         /* Precondition */
         sync.append(":precondition (and ");
         sync.append(String.format("(cur_state t%s) ", t.getInputState().getName()));
@@ -182,7 +183,7 @@ public class StripsEncoding extends AbstractEncoding {
         }
 //        del action for every trace transitions
         for (Transition<String> trace_tr : this.trace_automaton.getTransitionFunction()) {
-            PDDL_domain_buffer.append(_sync_completionString(trace_tr, i));
+            PDDL_domain_buffer.append(_sync_completionString(trace_tr));
             PDDL_domain_buffer.append(_del_opString(trace_tr));
         }
 //        goto-goal for dummy goal states
