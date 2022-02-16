@@ -32,7 +32,7 @@
         )
     )
     (:action del
-        :parameters (?t1 - trace_state ?e - act ?t2 - trace_state)
+        :parameters (?t1 - trace_state ?e - activity ?t2 - trace_state)
         :precondition (and (cur_state_trace ?t1) (trace_trans ?t1 ?e ?t2))
         :effect (and
                 (increase (total-cost) 1)
