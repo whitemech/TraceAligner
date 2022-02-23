@@ -49,8 +49,8 @@ public class StripsEncoding extends AbstractEncoding {
     private List<CombinationOfTransitions> combTrans = new ArrayList<>();
     private List<CombinationOfStates> combStates;
 
-    public StripsEncoding(String name, Automaton<String> ta, Set<Automaton<String>> ca, List<CombinationOfStates> combStates, boolean onlyProblem) {
-        super(name, ta, ca, onlyProblem);
+    public StripsEncoding(String name, HashSet<String> ra, Automaton<String> ta, Set<Automaton<String>> ca, List<CombinationOfStates> combStates, boolean onlyProblem) {
+        super(name, ra, ta, ca, onlyProblem);
         this.trace_automaton = ta;
         this.constraint_automata = ca;
         this.combStates = combStates;
@@ -207,7 +207,9 @@ public class StripsEncoding extends AbstractEncoding {
         }
         for (Automaton<String> a : this.constraint_automata) {
             for (State s : a.getStates()) {
-                PDDL_problem_buffer.append(String.format("s_%s_%s - state\n", a.getId(), s.getName()));
+                if (!Objects.equals(s.getName(), "ink")) {
+                    PDDL_problem_buffer.append(String.format("s_%s_%s - state\n", a.getId(), s.getName()));
+                }
             }
             if (a.getAcceptStates().size() > 1) {
                 PDDL_problem_buffer.append(String.format("s_%s_goal - state\n", a.getId()));
@@ -239,68 +241,4 @@ public class StripsEncoding extends AbstractEncoding {
         return PDDL_problem_buffer;
     }
 
-    private static HashSet<State> _singletonFinal(Set<Automaton<String>> constraint_automata) {
-        return (HashSet<State>) constraint_automata.stream()
-                .filter(a -> a.getAcceptStates().size() == 1)
-                .flatMap(a -> a.getAcceptStates().stream()).collect(Collectors.toSet());
-    }
-
-    public static void main(String[] args) {
-        try {
-            Set<AutomatonTemplate> templates = new HashSet<>();
-            try (Stream<String> lines = Files.lines(Paths.get("ignore/models/s-models/10CONSTRAINTS/10constraints.ltlf"))) {
-                for (String line : (Iterable<String>) lines::iterator) {
-                    String automaton_print = "";
-                    automaton_print = LydiaAutomaton.callLydia(line, true);
-                    templates.add(ParseLydiaDFA.parseMONAprint(automaton_print));
-                }
-            }
-            XLog log = ParseLog.openLog("ignore/logs/s-logs/10constraints/1-constraint-inverted/log-from-10constr-model-1constr_inverted-1.xes");
-            int trace_nb = 0;
-            for (XTrace trace : log) {
-                Trace t = new Trace(XConceptExtension.instance().extractName(trace));
-                List<String> al_aut = new ArrayList<>();
-                for (XEvent event : trace) {
-                    String activityName = XConceptExtension.instance().extractName(event).toLowerCase();
-                    activityName = activityName.replaceAll("( |\\/|\\(|\\)|\\<|\\>|\\.)", "").replaceAll("(\\,|\\+|\\-)", "_");
-                    String eventType = XLifecycleExtension.instance().extractTransition(event).toLowerCase();
-                    al_aut.add(String.format("%s_%s", activityName, eventType));
-                }
-                t.setTrace_alphabet(al_aut);
-                TraceAutomaton<String> trace_aut = t.computeTraceAutomaton();
-                Set<Automaton<String>> tempConstraint = new HashSet<>();
-                for (AutomatonTemplate at : templates) {
-                    Automaton<String> ins_aut = at.computeAutomatonNoDeadEnds(new HashSet<>(al_aut));
-                    tempConstraint.add(ins_aut);
-                }
-                // Compute combination of states
-                List<CombinationOfStates> combStates = new ArrayList<>();
-                List<State> acceptStates = new ArrayList<>();
-                int k = 0;
-                for (Automaton<String> a : tempConstraint) {
-                    if (a.getAcceptStates().size() > 1) {
-                        k++;
-                        acceptStates.addAll(a.getAcceptStates());
-                    }
-                }
-                if (acceptStates.size() > 0) {
-                    combStates = (List<CombinationOfStates>) Combinations.combinations(acceptStates, k, _singletonFinal(tempConstraint));
-                }
-                StripsEncoding se = new StripsEncoding("strips-conj", trace_aut, tempConstraint, combStates, false);
-                System.out.println(se.combTrans);
-                List<StringBuilder> res = se.generateString(trace_nb);
-                File problem_f = new File("output", String.format("p-man-%d.pddl", trace_nb));
-                if (res.size() > 1) {
-                    File domain_f = new File("output", String.format("d-man-%d.pddl", trace_nb));
-                    FileUtils.writeStringToFile(domain_f, res.get(0).toString(), "utf-8");
-                    FileUtils.writeStringToFile(problem_f, res.get(1).toString(), "utf-8");
-                } else {
-                    FileUtils.writeStringToFile(problem_f, res.get(0).toString(), "utf-8");
-                }
-                trace_nb++;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }
