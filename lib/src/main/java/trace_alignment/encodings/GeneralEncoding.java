@@ -26,11 +26,13 @@ public class GeneralEncoding extends AbstractEncoding {
 
     private boolean onlyProblem;
 
+    private final HashSet<String> repoActivity;
     private final TraceAutomaton<String> trace_automaton;
     private final Set<Automaton<String>> constraint_automata;
 
-    public GeneralEncoding(String name, TraceAutomaton<String> ta, Set<Automaton<String>> ca, boolean onlyProblem) {
-        super(name, ta,  ca, onlyProblem);
+    public GeneralEncoding(String name, HashSet<String> ra, TraceAutomaton<String> ta, Set<Automaton<String>> ca, boolean onlyProblem) {
+        super(name, ra, ta,  ca, onlyProblem);
+        this.repoActivity = ra;
         this.trace_automaton = ta;
         this.constraint_automata = ca;
         this.onlyProblem = onlyProblem;
@@ -92,18 +94,8 @@ public class GeneralEncoding extends AbstractEncoding {
                 PDDL_problem_buffer.append(" - automaton_state\n");
             }
         }
-        for (String event : this.trace_automaton.getAlphabet()) {
-            PDDL_problem_buffer.append(event).append(" - activity\n");
-        }
-        Set<String> seen = new HashSet<>();
-        for (Automaton<String> a : this.constraint_automata) {
-            Set<String> diff = new HashSet<>(a.getAlphabet());
-            diff.removeAll(this.trace_automaton.getAlphabet());
-            diff.removeAll(seen);
-            for (String event : diff) {
-                PDDL_problem_buffer.append(event).append(" - activity\n");
-                seen.add(event);
-            }
+        for (String a: this.repoActivity) {
+            PDDL_problem_buffer.append(a).append(" - activity\n");
         }
         PDDL_problem_buffer.append(")\n");
         PDDL_problem_buffer.append("(:init\n(= (total-cost) 0)\n");
