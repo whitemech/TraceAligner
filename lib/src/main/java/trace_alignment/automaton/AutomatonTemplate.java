@@ -46,6 +46,10 @@ public class AutomatonTemplate {
         }
     }
 
+    public List<String> getAlphabet() {
+        return alphabet;
+    }
+
     private void updateDeadEndsTrans(Sets.SetView<String> diff) {
         for (String t : this.deadEnds) {
             String[] split_t = t.split(",");
@@ -56,7 +60,7 @@ public class AutomatonTemplate {
         }
     }
 
-    private void _trimming(Set<String> traceAlphabet) {
+    private void _trimming(HashSet<String> repoActivity) {
         HashSet<Integer> noSink = new HashSet<>(this.accepting_states);
         for (String t : this.transitions) {
             String[] split_t = t.split(",");
@@ -85,7 +89,7 @@ public class AutomatonTemplate {
                     }
                     else if (sum == 0) {
                         this.deadEnds.add(t);
-                        HashSet<String> setDifference = new HashSet<>(traceAlphabet);
+                        HashSet<String> setDifference = new HashSet<>(repoActivity);
                         this.alphabet.forEach(setDifference::remove);
                         for (String s : setDifference) {
                             this.deadEndTransitions.add(
@@ -109,10 +113,10 @@ public class AutomatonTemplate {
         }
     }
 
-    public Automaton<String> computeAutomatonNoDeadEnds(Set<String> traceAlphabet) {
-        this._trimming(traceAlphabet);
-        this.alphabet.forEach(traceAlphabet::remove);
-        Sets.SetView<String> difference = Sets.difference(traceAlphabet, this.seenActivities);
+    public Automaton<String> computeAutomatonNoDeadEnds(HashSet<String> repoActivity) {
+        this._trimming(repoActivity);
+        this.alphabet.forEach(repoActivity::remove);
+        Sets.SetView<String> difference = Sets.difference(repoActivity, this.seenActivities);
         if (difference.size() != 0) {
             this.updateDeadEndsTrans(difference);
             this.seenActivities.addAll(difference);
@@ -121,7 +125,7 @@ public class AutomatonTemplate {
         for (String t : this.transitions) {
             String[] _t = t.split(",");
             if (_t[1].matches("0+")) {
-                for (String r : traceAlphabet) {
+                for (String r : repoActivity) {
                     transitions.add(new Transition<>(this.statesMap.get(Integer.parseInt(_t[0])),
                             r, this.statesMap.get(Integer.parseInt(_t[2]))));
                 }
@@ -132,7 +136,7 @@ public class AutomatonTemplate {
             }
         }
         HashSet<String> new_alphabet = new HashSet<>(this.alphabet);
-        new_alphabet.addAll(traceAlphabet);
+        new_alphabet.addAll(repoActivity);
         Automaton<String> automaton = new Automaton<>(new_alphabet, new HashSet<>(this.statesMap.values()), transitions,
                 this.deadEndTransitions);
         automaton.getStates().forEach(s -> s.setAutomatonId(automaton.getId()));
@@ -140,8 +144,8 @@ public class AutomatonTemplate {
         return automaton;
     }
 
-    public Automaton<String> computeAutomatonWithDeadEnds(Set<String> traceAlphabet) {
-        this.alphabet.forEach(traceAlphabet::remove);
+    public Automaton<String> computeAutomatonWithDeadEnds(HashSet<String> repoActivity) {
+        this.alphabet.forEach(repoActivity::remove);
         for (Integer s : this.states) {
             this.statesMap.put(s, new State(String.valueOf(s), this.init.equals(s), this.accepting_states.contains(s)));
         }
@@ -149,7 +153,7 @@ public class AutomatonTemplate {
         for (String t : this.transitions) {
             String[] _t = t.split(",");
             if (_t[1].matches("0+")) {
-                for (String r : traceAlphabet) {
+                for (String r : repoActivity) {
                     transitions.add(new Transition<>(this.statesMap.get(Integer.parseInt(_t[0])),
                             r, this.statesMap.get(Integer.parseInt(_t[2]))));
                 }
@@ -160,7 +164,7 @@ public class AutomatonTemplate {
             }
         }
         HashSet<String> new_alphabet = new HashSet<>(this.alphabet);
-        new_alphabet.addAll(traceAlphabet);
+        new_alphabet.addAll(repoActivity);
         Automaton<String> automaton = new Automaton<>(new_alphabet, new HashSet<>(this.statesMap.values()), transitions,
                 new HashSet<>());
         automaton.getStates().forEach(s -> s.setAutomatonId(automaton.getId()));

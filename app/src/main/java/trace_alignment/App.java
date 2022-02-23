@@ -124,7 +124,7 @@ public class App implements Runnable {
                 Set<AutomatonTemplate> templates = new HashSet<>();
                 try (Stream<String> lines = Files.lines(formulas_file.toPath())) {
                     for (String line : (Iterable<String>) lines::iterator) {
-                        String automaton_print = "";
+                        String automaton_print;
                         if (ldlf) {
                             automaton_print = LydiaAutomaton.callLydia(line, false);
                         } else {
@@ -133,6 +133,9 @@ public class App implements Runnable {
                         templates.add(ParseLydiaDFA.parseMONAprint(automaton_print));
                     }
                 }
+                HashSet<String> activitiesRepo = new HashSet<>();
+                templates.forEach(t -> activitiesRepo.addAll(t.getAlphabet()));
+
                 final long t_automata_end = System.currentTimeMillis();
                 final long t_total_automata = t_automata_end - t_automata_start;
                 if (!quiet) {
@@ -160,19 +163,19 @@ public class App implements Runnable {
                             String eventType = XLifecycleExtension.instance().extractTransition(event).toLowerCase();
                             al_aut.add(String.format("%s_%s", activityName, eventType));
                         }
-
+                        activitiesRepo.addAll(al_aut);
                         t.setTrace_alphabet(al_aut);
                         TraceAutomaton<String> trace_aut = t.computeTraceAutomaton();
                         Set<Automaton<String>> tempConstraint = new HashSet<>();
 
                         if (Encoding.get(e).equals(Encoding.STRIPS_CONJ)) {
                             for (AutomatonTemplate at : templates) {
-                                tempConstraint.add(at.computeAutomatonNoDeadEnds(new HashSet<>(al_aut)));
+                                tempConstraint.add(at.computeAutomatonNoDeadEnds(new HashSet<>(activitiesRepo)));
                             }
                         }
                         else {
                             for (AutomatonTemplate at : templates) {
-                                tempConstraint.add(at.computeAutomatonWithDeadEnds(new HashSet<>(al_aut)));
+                                tempConstraint.add(at.computeAutomatonWithDeadEnds(new HashSet<>(activitiesRepo)));
                             }
                         }
 
@@ -203,27 +206,27 @@ public class App implements Runnable {
                         switch (Encoding.get(e)) {
                             case GENERAL:
                                 readAndWriteFromfile("domain-general", output_location, e);
-                                enc = new GeneralEncoding("general", trace_aut, tempConstraint,
-                                        true);
+                                enc = new GeneralEncoding("general", activitiesRepo, trace_aut,
+                                        tempConstraint, true);
                                 break;
                             case GENERAL_CONJ:
                                 readAndWriteFromfile("domain-general-conj", output_location, e);
-                                enc = new GeneralEncodingConjunctiveGoal("general-conj", trace_aut,
-                                        tempConstraint, true);
+                                enc = new GeneralEncodingConjunctiveGoal("general-conj", activitiesRepo,
+                                        trace_aut, tempConstraint, true);
                                 break;
                             case GENERAL_SHARE:
                                 readAndWriteFromfile("domain-general-share", output_location, e);
-                                enc = new GeneralEncodingShareStates("general-share", trace_aut,
-                                        tempConstraint, true);
+                                enc = new GeneralEncodingShareStates("general-share", activitiesRepo,
+                                        trace_aut, tempConstraint, true);
                                 break;
                             case GENERAL_CONJ_SHARE:
                                 readAndWriteFromfile("domain-general-conj-share", output_location, e);
                                 enc = new GeneralEncodingConjGoalAndShareStates("general-conj-share",
-                                        trace_aut, tempConstraint, true);
+                                        activitiesRepo, trace_aut, tempConstraint, true);
                                 break;
                             case STRIPS_CONJ:
-                                enc = new StripsEncoding("strips-conj", trace_aut, tempConstraint, combStates,
-                                        false);
+                                enc = new StripsEncoding("strips-conj", activitiesRepo, trace_aut,
+                                        tempConstraint, combStates, false);
                                 break;
                             default:
                                 throw new IllegalStateException("Unexpected value: " + Encoding.get(e));
