@@ -18,30 +18,11 @@
 
 package trace_alignment.utils;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
 public class Helpers {
 
-    public static void createFileFromString(String nomeFile, StringBuffer buffer) {
-        File file = null;
-        FileWriter fw = null;
-
-        try {
-            file = new File(nomeFile);
-            file.setExecutable(true);
-
-            fw = new FileWriter(file);
-            fw.write(buffer.toString());
-            fw.close();
-
-            //fw.flush();
-            //fw.close();
-        }
-        catch(IOException e) {
-            e.printStackTrace();
-        }
+    public static String postProcessDFA(String MONAoutput) {
+        MONAoutput = MONAoutput.replaceFirst("Initial state: 0", "Initial state: 1");
+        return MONAoutput.replaceAll("State 0: (X+) -> state 1", "");
     }
 
 }

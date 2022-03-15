@@ -39,15 +39,19 @@ cd ..
 echo "MONA installed."
 
 echo "Install Syft+..."
-wget https://github.com/whitemech/Syft/releases/download/v0.1.0/syft-3.0.0_ubuntu-20.04.tar.gz
-tar -xf syft-3.0.0_ubuntu-20.04.tar.gz
-cd  syft-3.0.0_ubuntu-20.04
+wget https://github.com/whitemech/Syft/releases/download/v0.1.1/syft+-0.1.1_ubuntu-20.04.tar.gz
+tar -xf syft+-0.1.1_ubuntu-20.04.tar.gz
+cd syft+-0.1.1_ubuntu-20.04
 sudo cp -P lib/* /usr/local/lib/
 cd ..
 echo "Syft+ installed."
 
 echo "Installing Lydia..."
-wget https://github.com/whitemech/lydia/releases/download/v0.1.2/lydia
+wget https://github.com/whitemech/lydia/releases/download/v0.1.3/lydia
 sudo chmod +x lydia
 sudo cp -P lydia /usr/local/bin/lydia
 echo "Lydia installed."
+
+echo "Installing LTLf2DFA..."
+pip install git+https://github.com/whitemech/LTLf2DFA.git@feat/main
+echo "LTLf2DFA installed."
