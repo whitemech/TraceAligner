@@ -39,14 +39,10 @@ cd ..
 echo "MONA installed."
 
 echo "Install Syft+..."
-git clone https://github.com/whitemech/Syft.git
-cd Syft
-git checkout v0.1.1
-/bin/rm -rf build
-mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
-make -j
-sudo make install
+wget https://github.com/whitemech/Syft/releases/download/v0.1.1/syft+-0.1.1_ubuntu-20.04.tar.gz
+tar -xf syft+-0.1.1_ubuntu-20.04.tar.gz
+cd syft+-0.1.1_ubuntu-20.04
+sudo cp -P lib/* /usr/local/lib/
 cd ..
 echo "Syft+ installed."
 
