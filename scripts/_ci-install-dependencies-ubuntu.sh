@@ -39,15 +39,19 @@ cd ..
 echo "MONA installed."
 
 echo "Install Syft+..."
-wget https://github.com/whitemech/Syft/releases/download/v0.1.0/syft-3.0.0_ubuntu-20.04.tar.gz
-tar -xf syft-3.0.0_ubuntu-20.04.tar.gz
-cd  syft-3.0.0_ubuntu-20.04
-sudo cp -P lib/* /usr/local/lib/
+git clone https://github.com/whitemech/Syft.git
+cd Syft
+git checkout v0.1.1
+/bin/rm -rf build
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make -j
+sudo make install
 cd ..
 echo "Syft+ installed."
 
 echo "Installing Lydia..."
-wget https://github.com/whitemech/lydia/releases/download/v0.1.2/lydia
+wget https://github.com/whitemech/lydia/releases/download/v0.1.3/lydia
 sudo chmod +x lydia
 sudo cp -P lydia /usr/local/bin/lydia
 echo "Lydia installed."
