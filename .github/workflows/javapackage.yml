@@ -13,10 +13,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
       - name: Install tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget python3-pip
+          sudo apt-get install -y wget
       - name: Check File Headers
         run: python3 ./scripts/check_copyright_notice.py
           
