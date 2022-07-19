@@ -141,7 +141,7 @@ public class GeneralEncoding extends AbstractEncoding {
                 PDDL_problem_buffer.append(String.format("(cur_state s_%s_%s) ", a.getId(), a.getAcceptStates().get(0).getName()));
             }
         }
-        PDDL_problem_buffer.append(String.format("(final_state t%s)", this.trace_automaton.getAcceptStates().get(0).getName()));
+        PDDL_problem_buffer.append(String.format("(cur_state t%s)", this.trace_automaton.getAcceptStates().get(0).getName()));
         PDDL_problem_buffer.append("))\n");
         PDDL_problem_buffer.append("(:metric minimize (total-cost))\n");
         PDDL_problem_buffer.append(")\n");
