@@ -31,7 +31,7 @@ public class GeneralEncoding extends AbstractEncoding {
     private final Set<Automaton<String>> constraint_automata;
 
     public GeneralEncoding(String name, HashSet<String> ra, TraceAutomaton<String> ta, Set<Automaton<String>> ca, boolean onlyProblem) {
-        super(name, ra, ta,  ca, onlyProblem);
+        super(name, ra, ta, ca, onlyProblem);
         this.repoActivity = ra;
         this.trace_automaton = ta;
         this.constraint_automata = ca;
@@ -94,7 +94,7 @@ public class GeneralEncoding extends AbstractEncoding {
                 PDDL_problem_buffer.append(" - automaton_state\n");
             }
         }
-        for (String a: this.repoActivity) {
+        for (String a : this.repoActivity) {
             PDDL_problem_buffer.append(a).append(" - activity\n");
         }
         PDDL_problem_buffer.append(")\n");
@@ -129,7 +129,20 @@ public class GeneralEncoding extends AbstractEncoding {
             }
         }
         PDDL_problem_buffer.append(")\n");
-        PDDL_problem_buffer.append("(:goal (forall (?s - state) (imply (cur_state ?s) (final_state ?s))))\n");
+        PDDL_problem_buffer.append("(:goal (and ");
+        for (Automaton<String> a : this.constraint_automata) {
+            if (a.getAcceptStates().size() > 1) {
+                PDDL_problem_buffer.append("(or ");
+                for (State s : a.getAcceptStates()) {
+                    PDDL_problem_buffer.append(String.format("(cur_state s_%s_%s) ", a.getId(), s.getName()));
+                }
+                PDDL_problem_buffer.append(") ");
+            } else {
+                PDDL_problem_buffer.append(String.format("(cur_state s_%s_%s) ", a.getId(), a.getAcceptStates().get(0).getName()));
+            }
+        }
+        PDDL_problem_buffer.append(String.format("(final_state t%s)", this.trace_automaton.getAcceptStates().get(0).getName()));
+        PDDL_problem_buffer.append("))\n");
         PDDL_problem_buffer.append("(:metric minimize (total-cost))\n");
         PDDL_problem_buffer.append(")\n");
         return PDDL_problem_buffer;
