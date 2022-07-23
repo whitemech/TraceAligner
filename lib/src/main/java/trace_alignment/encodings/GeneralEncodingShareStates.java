@@ -133,10 +133,25 @@ public class GeneralEncodingShareStates extends AbstractEncoding {
             }
         }
         PDDL_problem_buffer.append(")\n");
-        PDDL_problem_buffer.append("(:goal (and\n(cur_state_trace t")
-                .append(this.trace_automaton.getAcceptStates().get(0).getName()).append(")\n");
-        PDDL_problem_buffer.append("(forall (?a - automaton ?s - automaton_state) " +
-                "(imply (cur_state ?a ?s) (final_state ?a ?s)))))\n");
+//        PDDL_problem_buffer.append("(:goal (and\n(cur_state_trace t")
+//                .append(this.trace_automaton.getAcceptStates().get(0).getName()).append(")\n");
+        PDDL_problem_buffer.append("(:goal (and ");
+        for (Automaton<String> a : this.constraint_automata) {
+            if (a.getAcceptStates().size() > 1) {
+                PDDL_problem_buffer.append("(or ");
+                for (State s : a.getAcceptStates()) {
+                    PDDL_problem_buffer.append(String.format("(cur_state a%s s%s) ", a.getId(), s.getName()));
+                }
+                PDDL_problem_buffer.append(") ");
+            } else {
+                PDDL_problem_buffer.append(String.format("(cur_state a%s s%s) ", a.getId(), a.getAcceptStates().get(0).getName()));
+            }
+        }
+        PDDL_problem_buffer.append(String.format("(cur_state_trace t%s)", this.trace_automaton.getAcceptStates().get(0).getName()));
+        PDDL_problem_buffer.append("))\n");
+
+//        PDDL_problem_buffer.append("(forall (?a - automaton ?s - automaton_state) " +
+//                "(imply (cur_state ?a ?s) (final_state ?a ?s)))))\n");
         PDDL_problem_buffer.append("(:metric minimize (total-cost))\n");
         PDDL_problem_buffer.append(")\n");
         return PDDL_problem_buffer;
