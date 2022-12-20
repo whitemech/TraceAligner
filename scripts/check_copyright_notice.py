@@ -1,22 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 #
-#  This file is part of Planning-Trace-Alignment.
+# Copyright 2021-2023 WhiteMech
 #
-#  Planning-Trace-Alignment is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU Lesser General Public License as published by
-#  the Free Software Foundation, either version 3 of the License, or
-#  (at your option) any later version.
+# ------------------------------
 #
-#  Planning-Trace-Alignment is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU Lesser General Public License for more details.
+# This file is part of Trace-Alignment.
 #
-#  You should have received a copy of the GNU Lesser General Public License
-#  along with Planning-Trace-Alignment.  If not, see <https://www.gnu.org/licenses/>.
-#
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
 #
 
 import inspect
@@ -31,52 +24,44 @@ BASH_SHEBANG = r"#!/usr/bin/env bash"
 PY_SHEBANG = r"#!/usr/bin/env python3"
 PY_ENCODING_HEADER = r"# -\*- coding: utf-8 -\*-"
 STAR_COPYRIGHT_NOTICE = r"""/\*
- \*  This file is part of Planning-Trace-Alignment.
+ \*  
+ \*  Copyright 2021-2023 WhiteMech
+ \*  
+ \*  ------------------------------
+ \*  
+ \*  This file is part of Trace-Alignment\.
  \*
- \*  Planning-Trace-Alignment is free software: you can redistribute it and/or modify
- \*  it under the terms of the GNU Lesser General Public License as published by
- \*  the Free Software Foundation, either version 3 of the License, or
- \*  \(at your option\) any later version.
- \*
- \*  Planning-Trace-Alignment is distributed in the hope that it will be useful,
- \*  but WITHOUT ANY WARRANTY; without even the implied warranty of
- \*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- \*  GNU Lesser General Public License for more details.
- \*
- \*  You should have received a copy of the GNU Lesser General Public License
- \*  along with Planning-Trace-Alignment.  If not, see <https://www.gnu.org/licenses/>.
+ \*  Use of this source code is governed by an MIT-style
+ \*  license that can be found in the LICENSE file or at
+ \*  https://opensource\.org/licenses/MIT\.
  \*
  \*/"""
 HASH_COPYRIGHT_NOTICE = r"""#
-#  This file is part of Planning-Trace-Alignment.
+# Copyright 2021-2023 WhiteMech
 #
-#  Planning-Trace-Alignment is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU Lesser General Public License as published by
-#  the Free Software Foundation, either version 3 of the License, or
-#  \(at your option\) any later version.
+# ------------------------------
 #
-#  Planning-Trace-Alignment is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU Lesser General Public License for more details.
+# This file is part of Trace-Alignment\.
 #
-#  You should have received a copy of the GNU Lesser General Public License
-#  along with Planning-Trace-Alignment.  If not, see <https://www.gnu.org/licenses/>.
-#
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource\.org/licenses/MIT\.
 #"""
 
 JAVA_HEADER_REGEX = re.compile(r"^{}".format(STAR_COPYRIGHT_NOTICE), re.MULTILINE)
-SHELL_HEADER_REGEX = re.compile(r"^{}\n\n{}".format(BASH_SHEBANG, HASH_COPYRIGHT_NOTICE), re.MULTILINE)
+SHELL_HEADER_REGEX = re.compile(r"^{}\n{}".format(BASH_SHEBANG, HASH_COPYRIGHT_NOTICE), re.MULTILINE)
 PY_HEADER_REGEX = re.compile(
-    r"^({}\n)?{}\n\n{}".format(PY_SHEBANG, PY_ENCODING_HEADER, HASH_COPYRIGHT_NOTICE),
+    r"^({}\n)?{}\n{}".format(PY_SHEBANG, PY_ENCODING_HEADER, HASH_COPYRIGHT_NOTICE),
     re.MULTILINE,
 )
 GRADLE_HEADER_REGEX = re.compile(r"^{}".format(STAR_COPYRIGHT_NOTICE), re.MULTILINE)
 
 ROOT = Path(os.path.dirname(inspect.getfile(inspect.currentframe())), "..").absolute()
 INCLUDE = {
-    *filter(methodcaller("is_file"), Path("src").glob("**/*")),
-    *filter(methodcaller("is_file"), Path("test").glob("**/*")),
+    *filter(methodcaller("is_file"), Path("app/src/main/java/trace_alignment").glob("**/*")),
+    *filter(methodcaller("is_file"), Path("app/src/test/java/trace_alignment").glob("**/*")),
+    *filter(methodcaller("is_file"), Path("lib/src/main/java/trace_alignment").glob("**/*")),
+    *filter(methodcaller("is_file"), Path("lib/src/test/java/trace_alignment").glob("**/*")),
     *filter(methodcaller("is_file"), Path("scripts").glob("**/*")),
     Path("settings.gradle"),
 }

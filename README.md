@@ -76,11 +76,19 @@ Afterwards, to run the program:
 java -jar app/build/libs/app-0.0.1.jar
 ```
 
+## Authors
+
+- [Francesco Fuggitti](https://francescofuggitti.github.io)
+
 ## License
 
-This software is released under the GNU Lesser General Public License version 3 or later.
+This software is released under the MIT License.
+
+Copyright (c) 2021-2023 WhiteMech
 
 ## Acknowledgements
 
 This work has been partially funded by the [ERC Advanced Grant "WhiteMech"](whitemech.github.io/)
-(No. 834228) and by the [TAILOR research network](https://tailor-network.eu/) (No. 952215).
+(No. 834228) and by the [TAILOR research network](https://tailor-network.eu/) (No. 952215), the PRIN project 
+RIPER (No. 20203FFYLK), and the JPMorgan AI Faculty Research Award "Resilience-based Generalized Planning and 
+Strategic Reasoning".
