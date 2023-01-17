@@ -1,4 +1,4 @@
-# Trace-Alignment
+# TraceAligner
 
 [![Trace-Alignment CI](https://github.com/whitemech/trace-alignment/actions/workflows/javapackage.yml/badge.svg)](https://github.com/whitemech/trace-alignment/actions/workflows/javapackage.yml)
 
@@ -9,9 +9,9 @@ This tool aligns log traces for Business Process Mining using Automated Planning
 This is the output of the cli `java -jar app/build/libs/app-0.0.1.jar --help`:
 
 ```bash
-Usage: Planning-Trace-Alignment [-hqV] [-e=encoding] -f=FORMULAS_FILE
+Usage: TraceAligner [-hqV] [-e=encoding] -f=FORMULAS_FILE
                                 -l=LOG_FILE [-o=OUT] LDLf
-Planning-Trace-Alignment aligns log trace using Automated Planning techniques.
+TraceAligner aligns log trace using Automated Planning techniques.
       LDLf                  If using LDLf formulas.
                               Default: false
   -q, --quiet               Quite mode.
