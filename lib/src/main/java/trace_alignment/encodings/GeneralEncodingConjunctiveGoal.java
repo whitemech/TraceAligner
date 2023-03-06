@@ -99,7 +99,7 @@ public class GeneralEncodingConjunctiveGoal extends AbstractEncoding {
                 PDDL_problem_buffer.append(" - automaton_state\n");
             }
             if (a.getAcceptStates().size() > 1) {
-                PDDL_problem_buffer.append("gs_").append(a.getId()).append(" - automaton_state");
+                PDDL_problem_buffer.append("gs_").append(a.getId()).append(" - automaton_state\n");
             }
         }
         for (String act: this.repoActivity) {
