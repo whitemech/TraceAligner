@@ -54,6 +54,7 @@ public class CombinationOfTransitions {
 
     public StringBuilder generateAddString(int nb) {
         StringBuilder add = new StringBuilder(String.format("(:action add-%s-c%d\n", this.label, nb));
+        add.append(":parameters ()\n");
         add.append(":precondition (and ");
         Set<Transition<String>> combined = new HashSet<>(this.inTransitions);
         combined.addAll(this.outTransitions);
@@ -85,6 +86,7 @@ public class CombinationOfTransitions {
 
     public StringBuilder generateSyncString(Transition<String> tr, int nb) {
         StringBuilder sync = new StringBuilder(String.format("(:action sync-%s-c%d\n", this.label, nb));
+        sync.append(":parameters ()\n");
         sync.append(":precondition (and ");
         Set<Transition<String>> combined = new HashSet<>(this.inTransitions);
         combined.addAll(this.outTransitions);

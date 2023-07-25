@@ -57,7 +57,7 @@ public class StripsEncoding extends AbstractEncoding {
     }
 
     /*
-     * Find all symbols of contraint automata.
+     * Find all symbols of constraint automata.
      */
     private void findAllSymbols() {
         this.constraint_automata.forEach(a -> this.all_symbols.addAll(a.getAlphabet()));
@@ -107,6 +107,7 @@ public class StripsEncoding extends AbstractEncoding {
     private StringBuilder _sync_completionString(Transition<String> t) {
         StringBuilder sync = new StringBuilder(String.format("(:action sync-%s-t%st%s\n", t.getSymbol(),
                 t.getInputState().getName(), t.getOutputState().getName()));
+        sync.append(":parameters ()\n");
         /* Precondition */
         sync.append(":precondition (and ");
         sync.append(String.format("(cur_state t%s) ", t.getInputState().getName()));
@@ -125,6 +126,7 @@ public class StripsEncoding extends AbstractEncoding {
 
     private StringBuilder _del_opString(Transition<String> t) {
         StringBuilder del = new StringBuilder(String.format("(:action del-%s-t%st%s\n", t.getSymbol(), t.getInputState().getName(), t.getOutputState().getName()));
+        del.append(":parameters ()\n");
         /* Precondition */
         del.append(":precondition (and ");
         del.append(String.format("(cur_state t%s)", t.getInputState().getName()));
@@ -138,6 +140,7 @@ public class StripsEncoding extends AbstractEncoding {
 
     private StringBuilder _goto_opString(List<String> pre, StringBuilder eff, int nb) {
         StringBuilder go_to = new StringBuilder(String.format("(:action gotoGoal-c%d\n", nb));
+        go_to.append(":parameters ()\n");
         /* Preconditions */
         go_to.append(":precondition (and ");
         go_to.append(String.format("(cur_state t%s) ", this.trace_automaton.getAcceptStates().get(0).getName()));
