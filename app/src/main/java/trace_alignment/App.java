@@ -90,10 +90,6 @@ public class App implements Runnable {
                     "Conjunctive Goals")
     private int e;
 
-    @Option(order = 4, names = {"-t", "--traslator"}, defaultValue = "0", arity = "1", paramLabel = "TRANSLATOR",
-            description = "The LTLf/LDLf to DFA translator.%n0: Lydia%n1: LTLf2DFA")
-    private int t;
-
     @Option(order = 5, names = {"-o", "--output"}, defaultValue = "./output/", paramLabel = "OUT",
             description = "Path to the output folder.")
     private String output_location;
@@ -128,12 +124,7 @@ public class App implements Runnable {
                         if (ldlf) {
                             automaton_print = LydiaAutomaton.callLydia(line, false);
                         } else {
-                            if (t == 1) {
-                                automaton_print = LtlfToDfaAutomaton.callLtlfToDfa(line);
-                            }
-                            else {
                                 automaton_print = LydiaAutomaton.callLydia(line, true);
-                            }
                         }
                         templates.add(ParseLydiaDFA.parseMONAprint(automaton_print));
                     }

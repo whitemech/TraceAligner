@@ -44,7 +44,3 @@ wget https://github.com/whitemech/lydia/releases/download/v0.1.3/lydia
 sudo chmod +x lydia
 sudo cp -P lydia /usr/local/bin/lydia
 echo "Lydia installed."
-
-echo "Installing LTLf2DFA..."
-pip install git+https://github.com/whitemech/LTLf2DFA.git@feat/main
-echo "LTLf2DFA installed."

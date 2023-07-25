@@ -23,7 +23,7 @@ jobs:
       - name: Check File Headers
         run: python3 ./scripts/check_copyright_notice.py
           
-      - name: Install cudd, mona, lydia, LTLf2DFA
+      - name: Install cudd, mona, lydia
         run: ./scripts/_ci-install-dependencies-ubuntu.sh
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
