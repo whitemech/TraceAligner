@@ -161,6 +161,21 @@ public class StripsEncoding extends AbstractEncoding {
         PDDL_domain_buffer.append("(define (domain alignment)\n");
         PDDL_domain_buffer.append("(:requirements :typing :negative-preconditions :action-costs)\n");
         PDDL_domain_buffer.append("(:types state)\n\n");
+        PDDL_domain_buffer.append("(:constants\n");
+        for (State s : this.trace_automaton.getStates()) {
+            PDDL_domain_buffer.append(String.format("t%s - state\n", s.getName()));
+        }
+        for (Automaton<String> a : this.constraint_automata) {
+            for (State s : a.getStates()) {
+                if (!Objects.equals(s.getName(), "ink")) {
+                    PDDL_domain_buffer.append(String.format("s_%s_%s - state\n", a.getId(), s.getName()));
+                }
+            }
+            if (a.getAcceptStates().size() > 1) {
+                PDDL_domain_buffer.append(String.format("s_%s_goal - state\n", a.getId()));
+            }
+        }
+        PDDL_domain_buffer.append(")\n\n");
         PDDL_domain_buffer.append("(:predicates\n");
         PDDL_domain_buffer.append("(cur_state ?s - state)\n");
         PDDL_domain_buffer.append(")\n\n");
@@ -200,21 +215,7 @@ public class StripsEncoding extends AbstractEncoding {
         StringBuilder PDDL_problem_buffer = new StringBuilder();
         PDDL_problem_buffer.append("(define (problem mining)\n");
         PDDL_problem_buffer.append("(:domain alignment)\n");
-        PDDL_problem_buffer.append("(:objects\n");
-        for (State s : this.trace_automaton.getStates()) {
-            PDDL_problem_buffer.append(String.format("t%s - state\n", s.getName()));
-        }
-        for (Automaton<String> a : this.constraint_automata) {
-            for (State s : a.getStates()) {
-                if (!Objects.equals(s.getName(), "ink")) {
-                    PDDL_problem_buffer.append(String.format("s_%s_%s - state\n", a.getId(), s.getName()));
-                }
-            }
-            if (a.getAcceptStates().size() > 1) {
-                PDDL_problem_buffer.append(String.format("s_%s_goal - state\n", a.getId()));
-            }
-        }
-        PDDL_problem_buffer.append(")\n\n");
+        PDDL_problem_buffer.append("(:objects\n)\n\n");
         PDDL_problem_buffer.append("(:init\n");
         PDDL_problem_buffer.append("(= (total-cost) 0)\n");
         PDDL_problem_buffer.append(String.format("(cur_state t%s)\n", this.trace_automaton.getInitState().getName()));
