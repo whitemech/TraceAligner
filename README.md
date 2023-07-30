@@ -76,6 +76,19 @@ Afterwards, to run the program:
 java -jar app/build/libs/app-0.0.1.jar
 ```
 
+## Apptainer image
+
+An Apptainer image is available for TraceAligner.
+
+To build the image, run:
+```bash
+apptainer build tracealigner.sif tracealigner.def
+```
+Then, you can run TraceAligner with:
+```bash
+./tracealigner.sif --help
+```
+
 ## Authors
 
 - [Francesco Fuggitti](https://francescofuggitti.github.io)
@@ -85,6 +98,23 @@ java -jar app/build/libs/app-0.0.1.jar
 This software is released under the MIT License.
 
 Copyright (c) 2021-2023 WhiteMech
+
+## Citing
+
+If you use TraceAligner in your research, please consider citing the following paper:
+
+```
+@article{si2023dfmmp,
+    title = {A Tool for Declarative Trace Alignment via Automated Planning},
+    author = {Giuseppe {De Giacomo} and Francesco Fuggitti and Fabrizio Maria Maggi and Andrea Marrella and Fabio Patrizi},
+    journal = {Software Impacts},
+    volume = {16},
+    pages = {100505},
+    year = {2023},
+    issn = {2665-9638},
+    doi = {https://doi.org/10.1016/j.simpa.2023.100505},
+}
+```
 
 ## Acknowledgements
 
