@@ -1,0 +1,63 @@
+Bootstrap: docker
+From: openjdk:8
+
+
+%files
+    app /opt/tracealigner/app
+    lib /opt/tracealigner/lib
+    third_party /opt/tracealigner/third_party
+    gradle /opt/tracealigner/gradle
+    settings.gradle /opt/tracealigner/settings.gradle
+    gradlew /opt/tracealigner/gradlew
+    README.md /opt/tracealigner/README.md
+    LICENSE /opt/tracealigner/LICENSE
+
+
+%post
+    apt-get update
+    apt-get install -y wget
+
+    echo "Installing CUDD..."
+    wget https://github.com/whitemech/cudd/releases/download/v3.0.0/cudd_3.0.0_linux-amd64.tar.gz
+    tar -xf cudd_3.0.0_linux-amd64.tar.gz
+    cd cudd_3.0.0_linux-amd64
+    cp -P lib/* /usr/local/lib/
+    cp -Pr include/* /usr/local/include
+    cd ..
+    echo "CUDD installed."
+
+    echo "Installing MONA..."
+    wget https://github.com/whitemech/MONA/releases/download/v1.4-19.dev0/mona_1.4-19.dev0_linux-amd64.tar.gz
+    tar -xf mona_1.4-19.dev0_linux-amd64.tar.gz
+    cd mona_1.4-19.dev0_linux-amd64
+    cp -P lib/* /usr/local/lib/
+    cp -Pr include/* /usr/local/include
+    cd ..
+    echo "MONA installed."
+
+    echo "Install Syft+..."
+    wget https://github.com/whitemech/Syft/releases/download/v0.1.1/syft+-0.1.1_ubuntu-20.04.tar.gz
+    tar -xf syft+-0.1.1_ubuntu-20.04.tar.gz
+    cd syft+-0.1.1_ubuntu-20.04
+    cp -P lib/* /usr/local/lib/
+    cd ..
+    echo "Syft+ installed."
+
+    echo "Installing Lydia..."
+    wget https://github.com/whitemech/lydia/releases/download/v0.1.3/lydia
+    chmod +x lydia
+    cp -P lydia /usr/local/bin/lydia
+    echo "Lydia installed."
+
+    cd /opt/tracealigner
+    ./gradlew build
+    ./gradlew install
+
+%runscript
+    exec java -jar /opt/tracealigner/app/build/libs/app-0.0.1.jar "$@"
+
+%labels
+    Name        TraceAligner
+    Version     v0.0.1
+    Authors     Francesco Fuggitti <francesco.fuggitti@gmail.com>
+    License     MIT

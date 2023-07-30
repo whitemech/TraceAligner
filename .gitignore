@@ -6,6 +6,9 @@
 output/
 *.log
 
+# Apptainer
+*.sif
+
 ### C++ ###
 # Prerequisites
 *.d
